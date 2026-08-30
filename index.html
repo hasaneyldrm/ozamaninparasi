@@ -154,21 +154,7 @@
     font-variant-numeric: tabular-nums; word-break: break-word;
   }
   .sub { font-size: 14.5px; color: var(--soft); }
-  .totals { display: flex; align-items: flex-end; gap: 22px; flex-wrap: wrap; }
-  .t-tl { min-width: 0; }
-  .t-usd {
-    min-width: 0; padding-left: 22px; border-left: 1px solid var(--hair);
-    padding-bottom: 3px;
-  }
-  .t-usd .t-val {
-    font-size: clamp(24px, 3.2vw, 32px); font-weight: 700; letter-spacing: -0.03em;
-    color: var(--dolar); font-variant-numeric: tabular-nums; white-space: nowrap;
-  }
-  @media (max-width: 520px) {
-    .totals { gap: 14px; }
-    .t-usd { padding-left: 0; border-left: 0; padding-bottom: 0; }
-    .t-usd .t-val { font-size: 24px; }
-  }
+  .usd-val { color: var(--dolar); font-weight: 700; font-variant-numeric: tabular-nums; }
   .note { margin-top: 14px; background: var(--wash); border-radius: 12px; padding: 10px 13px; font-size: 13.5px; color: var(--ink); }
   .note[hidden] { display: none; }
 
@@ -369,16 +355,8 @@
 
     <section class="card result" id="sonuc" aria-live="polite">
       <div class="lead" id="lead"></div>
-      <div class="totals">
-        <div class="t-tl">
-          <div class="big" id="buyuk">—</div>
-          <div class="sub" id="buyukAlt"></div>
-        </div>
-        <div class="t-usd" id="usdKutu">
-          <div class="t-val" id="buyukUsd"></div>
-          <div class="sub">bugünün dolarıyla</div>
-        </div>
-      </div>
+      <div class="big" id="buyuk">—</div>
+      <div class="sub" id="buyukAlt"></div>
       <div class="note" id="uyari" hidden></div>
       <div class="flow" id="akis"></div>
 
@@ -593,7 +571,6 @@
       $("buyuk").textContent = "—";
       $("buyukAlt").textContent = girilen ? "Bu dönem için veri yok." : "Bir tutar yaz.";
       $("satirlar").innerHTML = "";
-      $("buyukUsd").textContent = "";
       $("akis").innerHTML = "";
       $("uyari").hidden = true;
       return;
@@ -609,8 +586,8 @@
 
     $("lead").innerHTML = "<b>" + donem + " " + girilenMetin + "</b> bugün";
     sayacYaz(tlNow, animasyonlu);
-    $("buyukAlt").textContent = trPara.format(tlNow / tutarTL) + " katı";
-    $("buyukUsd").textContent = usd(usdNow);
+    $("buyukAlt").innerHTML = '<b class="usd-val">' + usd(usdNow) + "</b> · " +
+      trPara.format(tlNow / tutarTL) + " katı";
 
     $("akis").innerHTML =
       dugum(0, "", rozet("tl", "₺", "#ff385c"), tl(tutarTL), donem.replace(/'(de|da|te|ta)$/, "")) +

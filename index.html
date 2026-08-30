@@ -165,7 +165,10 @@
   @media (max-width: 560px) { .result { padding: 24px 18px 20px; } }
   .lead { font-size: 14px; color: var(--soft); line-height: 1.45; }
   .lead b { color: var(--ink); font-weight: 600; }
-  .big .cur { color: var(--rausch); }
+  .big .cur {
+    color: var(--rausch); font-size: .42em; font-weight: 700;
+    letter-spacing: -0.01em; margin-left: .14em;
+  }
   .big {
     margin: 8px 0 14px;
     font-size: clamp(40px, 6.4vw, 62px); font-weight: 700;
@@ -181,6 +184,10 @@
   .tag b { font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
   .tag.usd { background: var(--dolar-wash); color: #3f7f60; }
   .tag.usd b { color: var(--dolar); }
+  .tag.kat {
+    background: #fff1f3; color: #9c3350; font-size: 14.5px; padding: 8px 16px; font-weight: 500;
+  }
+  .tag.kat b { color: var(--rausch); font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
   .tag.eur { background: #eaf0fb; color: #45608f; }
   .tag.eur b { color: #1f5fbf; }
   .note { margin-top: 14px; background: var(--wash); border-radius: 12px; padding: 10px 13px; font-size: 13.5px; color: var(--ink); }
@@ -252,12 +259,16 @@
     font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
     color: var(--soft); margin-bottom: 9px;
   }
-  .bubble .row { display: flex; justify-content: space-between; gap: 16px; padding: 3px 0; }
-  .bubble .row span { color: var(--soft); }
-  .bubble .row b { font-size: 13px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .bubble .row.sum { margin-top: 7px; padding-top: 9px; border-top: 1px solid var(--hair); }
-  .bubble .row.sum span { color: var(--ink); font-weight: 600; }
-  .bubble .row.sum b { font-size: 15px; font-weight: 700; }
+  .mini { display: flex; align-items: flex-start; justify-content: center; gap: 6px; flex-wrap: wrap; }
+  .mini .step { display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 0; }
+  .mini .v { font-size: 14.5px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .mini .v.tl { color: var(--rausch); }
+  .mini .v.usd { color: var(--dolar); }
+  .mini .v.eur { color: #1f5fbf; }
+  .mini .v.son { font-size: 16px; }
+  .mini .c { margin-top: 2px; font-size: 11px; line-height: 1.3; color: var(--soft); }
+  .mini .ar { display: flex; flex-direction: column; align-items: center; padding-top: 4px; }
+  .mini .ar .op { margin-top: 3px; font-size: 10.5px; color: var(--soft); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
   .rb {
     width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
@@ -541,15 +552,22 @@
   var azHareket = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var sayacId = null;
 
-  function balonSatir(k, v, sinif) {
-    return '<div class="row' + (sinif || "") + '"><span>' + k + "</span><b>" + v + "</b></div>";
+  function miniAdim(deger, sinif, etiket) {
+    return '<span class="step"><span class="v ' + sinif + '">' + deger + '</span>' +
+      '<span class="c">' + etiket + "</span></span>";
+  }
+
+  function miniOk(etiket) {
+    return '<span class="ar"><svg width="16" height="8" viewBox="0 0 18 8" fill="none" aria-hidden="true">' +
+      '<path d="M0 4h15M12 1l3 3-3 3" stroke="#c3c3c3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      '<span class="op">' + etiket + "</span></span>";
   }
 
   function sayacYaz(hedef, animasyonlu) {
     var el = $("buyuk");
     var bicim = hedef >= 1000
-      ? function (n) { return trPara.format(n) + ' <span class="cur">₺</span>'; }
-      : function (n) { return trPara2.format(n) + ' <span class="cur">₺</span>'; };
+      ? function (n) { return trPara.format(n) + ' <span class="cur">TL</span>'; }
+      : function (n) { return trPara2.format(n) + ' <span class="cur">TL</span>'; };
     if (sayacId) { cancelAnimationFrame(sayacId); sayacId = null; }
     if (!animasyonlu || azHareket) { el.innerHTML = bicim(hedef); return; }
     var bas = null, sure = 620;
@@ -577,17 +595,19 @@
       if (GUNCEL_EUR) parcalar += fxOge("eur", "€", "—", "1 euro = " + trPara2.format(GUNCEL_EUR) + " ₺", "");
     } else {
       var dolarBalon =
-        '<div class="baslik">Dolar hesabı</div>' +
-        balonSatir(d.donem + " tutarı", tl(d.tutarTL)) +
-        balonSatir("O günkü kur", "1 $ = " + kurYaz(d.kur)) +
-        balonSatir("O gün ederi", usd(d.usdThen)) +
-        balonSatir("ABD enflasyonu", "+%" + trPara.format((d.enflasyonKat - 1) * 100)) +
-        balonSatir("Bugünkü doları", usd(d.usdNow), " sum");
+        '<div class="baslik">Dolar hesabı</div><div class="mini">' +
+        miniAdim(tl(d.tutarTL), "tl", d.donem) +
+        miniOk("kur " + kurYaz(d.kur).replace(" ₺", "")) +
+        miniAdim(usd(d.usdThen), "usd", "o günkü dolar") +
+        miniOk("+%" + trPara.format((d.enflasyonKat - 1) * 100)) +
+        miniAdim(usd(d.usdNow), "usd son", "bugünkü dolar") +
+        "</div>";
       var euroBalon =
-        '<div class="baslik">Euro hesabı</div>' +
-        balonSatir("Bugünkü karşılığı", tl(d.tlNow)) +
-        balonSatir("Bugünkü kur", "1 € = " + trPara2.format(GUNCEL_EUR) + " ₺") +
-        balonSatir("Euro cinsinden", "€" + trPara.format(d.tlNow / GUNCEL_EUR), " sum");
+        '<div class="baslik">Euro hesabı</div><div class="mini">' +
+        miniAdim(tl(d.tlNow), "tl", "bugünkü karşılığı") +
+        miniOk("kur " + trPara2.format(GUNCEL_EUR)) +
+        miniAdim("€" + trPara.format(d.tlNow / GUNCEL_EUR), "eur son", "bugünkü euro") +
+        "</div>";
 
       parcalar = fxOge("usd", "$", usd(d.usdNow), "1 dolar = " + trPara2.format(GUNCEL_KUR) + " ₺", dolarBalon);
       if (GUNCEL_EUR) {
@@ -642,7 +662,7 @@
     $("lead").innerHTML = "<b>" + donem + " " + girilenMetin + "</b> bugün";
     sayacYaz(tlNow, animasyonlu);
     $("buyukAlt").innerHTML =
-      '<span class="tag"><b>' + trPara.format(tlNow / tutarTL) + "×</b> katına çıktı</span>";
+      '<span class="tag kat"><b>' + trPara.format(tlNow / tutarTL) + "×</b> katına çıktı</span>";
 
     kurSeridiYaz({
       donem: donem.replace(/'(de|da|te|ta)$/, ""),

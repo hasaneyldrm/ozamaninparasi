@@ -180,6 +180,8 @@
   .tag b { font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
   .tag.usd { background: var(--dolar-wash); color: #3f7f60; }
   .tag.usd b { color: var(--dolar); }
+  .tag.eur { background: #eaf0fb; color: #45608f; }
+  .tag.eur b { color: #1f5fbf; }
   .note { margin-top: 14px; background: var(--wash); border-radius: 12px; padding: 10px 13px; font-size: 13.5px; color: var(--ink); }
   .note[hidden] { display: none; }
 
@@ -198,17 +200,18 @@
   .badge.now { background: linear-gradient(to bottom right, #e61e4d, #d70466); }
   .node .val { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .node .val.uzun { font-size: 13.5px; letter-spacing: -0.03em; }
+  .node .val.cokuzun { font-size: 12px; letter-spacing: -0.03em; }
   .node.son .val { color: var(--rausch); }
   .node.usd .val { color: var(--dolar); }
   .node .cap { margin-top: 3px; font-size: 11.5px; line-height: 1.35; color: var(--soft); white-space: nowrap; }
-  .arrow { flex: 0 0 auto; width: 58px; padding-top: 12px; text-align: center; }
-  .arrow .op { display: block; margin-top: 5px; font-size: 11px; line-height: 1.35; color: var(--soft); font-variant-numeric: tabular-nums; }
+  .arrow { flex: 0 0 auto; width: 62px; padding-top: 12px; text-align: center; }
+  .arrow .op { display: block; margin-top: 5px; font-size: 11px; line-height: 1.35; color: var(--soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
   .arrow svg { opacity: .5; }
   @media (max-width: 620px) {
     .flow { flex-direction: column; align-items: stretch; gap: 0; }
     .node { display: flex; align-items: center; gap: 12px; text-align: left; padding: 6px 0; }
     .badge { margin: 0; flex: none; }
-    .node .val, .node .val.uzun { font-size: 17px; }
+    .node .val, .node .val.uzun, .node .val.cokuzun { font-size: 17px; }
     .node .cap { margin: 0 0 0 auto; text-align: right; white-space: normal; }
     .arrow {
       width: auto; padding: 0 0 0 18px; text-align: left;
@@ -220,7 +223,7 @@
   }
 
   /* ---- katlanabilir dokum ---- */
-  .detay { margin-top: 18px; border-top: 1px solid var(--hair); padding-top: 10px; }
+  .detay { margin-top: 14px; padding-top: 4px; }
   .detay summary {
     cursor: pointer; list-style: none; font-size: 13px; font-weight: 600; color: var(--soft);
     padding: 6px 0; display: flex; align-items: center; justify-content: center; gap: 6px;
@@ -249,16 +252,21 @@
   .foot { border-top: 1px solid var(--hair); padding: 20px 0 34px; }
   .foot .shell { display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; font-size: 13px; color: var(--soft); }
   .foot-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-  .rates { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-  .rate { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; color: var(--ink); }
-  .rate b { font-weight: 700; font-variant-numeric: tabular-nums; }
+  /* ---- kart ici guncel kur satiri ---- */
+  .fx {
+    display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+    gap: 8px 18px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--hair);
+    font-size: 13px; color: var(--soft);
+  }
+  .fx-item { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+  .fx-item b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
   .rb {
     width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
-    font-size: 12px; font-weight: 700;
+    font-size: 12px; font-weight: 700; flex: none;
   }
   .rb.usd { background: var(--dolar-wash); color: var(--dolar); }
   .rb.eur { background: #eaf0fb; color: #1f5fbf; }
-  .rate-day { font-size: 12px; color: var(--ink-dim, var(--soft)); }
+  .fx-day { font-size: 12px; color: var(--soft); }
   .foot-link { border: 0; background: none; padding: 0; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 
   /* ---- modal ---- */
@@ -390,6 +398,7 @@
       <div class="sub" id="buyukAlt"></div>
       <div class="note" id="uyari" hidden></div>
       <div class="flow" id="akis"></div>
+      <div class="fx" id="fxSatir"></div>
 
       <details class="detay">
         <summary>Detaylı döküm</summary>
@@ -402,15 +411,8 @@
 
 <footer class="foot">
   <div class="shell">
-    <div class="rates" id="kurlar">
-      <span class="rate"><span class="rb usd">$</span><span><b id="kurUsd">—</b> ₺</span></span>
-      <span class="rate"><span class="rb eur">€</span><span><b id="kurEur">—</b> ₺</span></span>
-      <span class="rate-day" id="kurTarih"></span>
-    </div>
-    <div class="foot-right">
-      <span>Sonuçlar yaklaşıktır. Veri: <span id="guncelleme"></span></span>
-      <button class="foot-link" type="button" data-ac>Nasıl hesaplanıyor?</button>
-    </div>
+    <span>Sonuçlar yaklaşıktır. Kur ve enflasyon verisi: <span id="guncelleme"></span></span>
+    <button class="foot-link" type="button" data-ac>Nasıl hesaplanıyor?</button>
   </div>
 </footer>
 
@@ -488,12 +490,10 @@
   // Akis semasinda cok buyuk tutarlar kutuyu tasirmasin
   function kisaTl(n) {
     if (n >= 1e9) return trPara2.format(n / 1e9) + " mlr ₺";
-    if (n >= 1e6) return trPara2.format(n / 1e6) + " mn ₺";
     return tl(n);
   }
   function kisaUsd(n) {
     if (n >= 1e9) return "$" + trPara2.format(n / 1e9) + " mlr";
-    if (n >= 1e6) return "$" + trPara2.format(n / 1e6) + " mn";
     return usd(n);
   }
 
@@ -562,7 +562,7 @@
   }
 
   function dugum(i, sinif, rozetHtml, deger, etiket) {
-    var uzun = deger.length > 9 ? " uzun" : "";
+    var uzun = deger.length > 12 ? " cokuzun" : (deger.length > 8 ? " uzun" : "");
     return '<div class="node ' + sinif + '" style="--i:' + i + '">' + rozetHtml +
       '<div class="val' + uzun + '">' + deger + '</div><div class="cap">' + etiket + "</div></div>";
   }
@@ -590,6 +590,16 @@
       else { el.textContent = bicim(hedef); sayacId = null; }
     }
     sayacId = requestAnimationFrame(adim);
+  }
+
+  function kurSeridiYaz() {
+    var parcalar =
+      '<span class="fx-item"><span class="rb usd">$</span>1 dolar = <b>' + trPara2.format(GUNCEL_KUR) + " ₺</b></span>";
+    if (GUNCEL_EUR) {
+      parcalar += '<span class="fx-item"><span class="rb eur">€</span>1 euro = <b>' + trPara2.format(GUNCEL_EUR) + " ₺</b></span>";
+    }
+    parcalar += '<span class="fx-day">' + KUR_TARIH.split("-").reverse().join(".") + " kuru</span>";
+    $("fxSatir").innerHTML = parcalar;
   }
 
   function line(k, v, sinif) {
@@ -620,6 +630,7 @@
       $("uyari").hidden = true;
       $("tutarUyari").hidden = true;
       $("tutarNot").textContent = "";
+      kurSeridiYaz();
       return;
     }
 
@@ -633,17 +644,20 @@
 
     $("lead").innerHTML = "<b>" + donem + " " + girilenMetin + "</b> bugün";
     sayacYaz(tlNow, animasyonlu);
+    var euroSatir = GUNCEL_EUR
+      ? '<span class="tag eur"><b>€' + trPara.format(tlNow / GUNCEL_EUR) + "</b> bugünün eurosu</span>"
+      : "";
     $("buyukAlt").innerHTML =
-      '<span class="tag usd"><b>' + usd(usdNow) + "</b> bugünün doları</span>" +
+      '<span class="tag usd"><b>' + usd(usdNow) + "</b> bugünün doları</span>" + euroSatir +
       '<span class="tag"><b>' + trPara.format(tlNow / tutarTL) + "×</b> katına çıktı</span>";
 
     $("akis").innerHTML =
       dugum(0, "", rozet("tl", "₺", "#ff385c"), kisaTl(tutarTL), donem.replace(/'(de|da|te|ta)$/, "")) +
-      ok(0, "kur " + kurKisa(k.deger)) +
+      ok(0, "÷ " + kurKisa(k.deger) + " ₺") +
       dugum(1, "usd", rozet("usd", "$", "#0e8a4f"), kisaUsd(usdThen), "o günkü dolar") +
       ok(1, "ABD enf. %" + trPara.format((enflasyonKat - 1) * 100)) +
       dugum(2, "usd", rozet("usd", "$", "#0e8a4f"), kisaUsd(usdNow), "bugünkü dolar") +
-      ok(2, "kur " + kurKisa(GUNCEL_KUR)) +
+      ok(2, "× " + kurKisa(GUNCEL_KUR) + " ₺") +
       dugum(3, "son", rozet("now", "₺", "#ffffff"), kisaTl(tlNow), "bugün");
 
     var kart = $("sonuc");
@@ -810,13 +824,6 @@
       navigator.share({ url: location.href });
     }
   });
-
-  function kurSeridiYaz() {
-    $("kurUsd").textContent = trPara2.format(GUNCEL_KUR);
-    if (GUNCEL_EUR) $("kurEur").textContent = trPara2.format(GUNCEL_EUR);
-    else $("kurEur").closest(".rate").hidden = true;
-    $("kurTarih").textContent = KUR_TARIH.split("-").reverse().join(".") + " kapanışı";
-  }
 
   $("kurKaynak").textContent = window.VERI.kaynak.kur;
   $("tufeKaynak").textContent = window.VERI.kaynak.tufe;

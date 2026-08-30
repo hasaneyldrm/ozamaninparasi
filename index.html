@@ -17,7 +17,7 @@
     --line: #dddddd;
     --hair: #ebebeb;
     --wash: #f7f7f7;
-    --rausch: #ff385c;
+    --marka: #ff385c;
     --dolar: #0e8a4f;
     --dolar-wash: #e9f7ef;
     --shadow: 0 6px 16px rgba(0, 0, 0, .12);
@@ -28,7 +28,7 @@
     margin: 0; min-height: 100vh; display: flex; flex-direction: column;
     background: #fff;
     color: var(--ink);
-    font: 16px/1.45 "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
   .shell { max-width: 1080px; margin: 0 auto; padding: 0 24px; width: 100%; }
@@ -44,7 +44,7 @@
   @media (max-width: 560px) { .topbar .shell { height: 62px; } }
   .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
   .brand svg { display: block; flex: none; }
-  .word { white-space: nowrap; font-size: 17px; letter-spacing: -0.025em; color: var(--rausch); font-weight: 500; }
+  .word { white-space: nowrap; font-size: 17px; letter-spacing: -0.025em; color: var(--marka); font-weight: 500; }
   .word b { color: var(--ink); font-weight: 700; }
   @media (max-width: 430px) { .word { font-size: 15px; } .brand svg { width: 28px; height: 28px; } }
   .pill-link {
@@ -108,7 +108,7 @@
     border-radius: 12px; padding: 11px 13px;
   }
   .oldcheck[hidden] { display: none; }
-  .oldcheck input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--rausch); flex: none; }
+  .oldcheck input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--marka); flex: none; }
   .oldcheck b { font-weight: 600; }
   .oldcheck em { font-style: normal; color: var(--soft); }
   .oldcheck-eq { display: block; margin-top: 3px; font-size: 12.5px; color: var(--soft); font-variant-numeric: tabular-nums; }
@@ -166,7 +166,7 @@
   .lead { font-size: 14px; color: var(--soft); line-height: 1.45; }
   .lead b { color: var(--ink); font-weight: 600; }
   .big .cur {
-    color: var(--rausch); font-size: .42em; font-weight: 700;
+    color: var(--marka); font-size: .42em; font-weight: 700;
     letter-spacing: -0.01em; margin-left: .14em;
   }
   .big {
@@ -187,7 +187,7 @@
   .tag.kat {
     background: #fff1f3; color: #9c3350; font-size: 14.5px; padding: 8px 16px; font-weight: 500;
   }
-  .tag.kat b { color: var(--rausch); font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
+  .tag.kat b { color: var(--marka); font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
   .tag.eur { background: #eaf0fb; color: #45608f; }
   .tag.eur b { color: #1f5fbf; }
   .note { margin-top: 14px; background: var(--wash); border-radius: 12px; padding: 10px 13px; font-size: 13.5px; color: var(--ink); }
@@ -268,7 +268,7 @@
   .mini .step { display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 0; gap: 1px; }
   .mini .rz { display: block; margin-bottom: 5px; }
   .mini .v { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .mini .v.tl { color: var(--rausch); }
+  .mini .v.tl { color: var(--marka); }
   .mini .v.usd { color: var(--dolar); }
   .mini .v.eur { color: #1f5fbf; }
   .mini .v.son { font-size: 16px; }
@@ -308,7 +308,7 @@
   .modal-x:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
   .modal-body { padding: 20px 24px 26px; }
   .steps { margin: 0 0 18px; padding-left: 20px; display: grid; gap: 12px; font-size: 15px; line-height: 1.55; color: var(--soft); }
-  .steps li::marker { color: var(--rausch); font-weight: 700; }
+  .steps li::marker { color: var(--marka); font-weight: 700; }
   .steps b { color: var(--ink); font-weight: 600; }
   .modal-note { margin: 0 0 12px; font-size: 14px; line-height: 1.55; color: var(--soft); }
   .modal-src { margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--hair); font-size: 12.5px; color: var(--soft); }
@@ -426,7 +426,7 @@
 
 <footer class="foot">
   <div class="shell">
-    <span>Sonuçlar yaklaşıktır. Kur ve enflasyon verisi: <span id="guncelleme"></span></span>
+    <span>Sonuçlar yaklaşıktır, yatırım tavsiyesi değildir. Veri: <span id="guncelleme"></span></span>
     <button class="foot-link" type="button" data-ac>Nasıl hesaplanıyor?</button>
   </div>
 </footer>

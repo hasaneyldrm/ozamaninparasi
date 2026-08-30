@@ -102,10 +102,28 @@
   }
   .when select:focus { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
 
-  .oldcheck { display: flex; align-items: flex-start; gap: 9px; font-size: 14px; color: var(--ink); cursor: pointer; }
+  .oldcheck {
+    display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; line-height: 1.45;
+    color: var(--ink); cursor: pointer; background: var(--wash);
+    border-radius: 12px; padding: 11px 13px;
+  }
   .oldcheck[hidden] { display: none; }
   .oldcheck input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--rausch); flex: none; }
+  .oldcheck b { font-weight: 600; }
   .oldcheck em { font-style: normal; color: var(--soft); }
+  .oldcheck-eq { display: block; margin-top: 3px; font-size: 12.5px; color: var(--soft); font-variant-numeric: tabular-nums; }
+
+  .fix {
+    display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap;
+    background: #fff6e5; border: 1px solid #ffdda6; border-radius: 12px;
+    padding: 11px 13px; font-size: 13px; line-height: 1.45; color: #7a4b00;
+  }
+  .fix[hidden] { display: none; }
+  .fix-btn {
+    border: 1px solid #b4762a; background: #fff; color: #7a4b00; border-radius: 999px;
+    padding: 5px 12px; font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
+  }
+  .fix-btn:hover { background: #fff9ef; }
 
   .go {
     width: 100%; height: 52px; border: 0; border-radius: 12px; cursor: pointer;
@@ -350,8 +368,14 @@
 
       <label class="oldcheck" id="eskiKutu" hidden>
         <input type="checkbox" id="eski" checked>
-        <span>Eski TL olarak yazdım <em>(2005'te 6 sıfır atıldı)</em></span>
+        <span><b>Eski TL olarak yazdım</b> <em>— 2005'te 6 sıfır atıldı</em>
+          <span class="oldcheck-eq" id="tutarNot"></span></span>
       </label>
+
+      <div class="fix" id="tutarUyari" hidden>
+        <span id="fixMetin"></span>
+        <button type="button" class="fix-btn" id="fixDugme"></button>
+      </div>
 
       <button class="go" id="git" type="button">Bugün ne eder?</button>
     </form>
@@ -460,6 +484,18 @@
   function usd(n) { return "$" + (n >= 1000 ? trPara.format(n) : trPara2.format(n)); }
   function kurYaz(n) { return (n >= 10 ? trPara2.format(n) : trKur.format(n)) + " ₺"; }
   function kurKisa(n) { return n < 1 ? trKur3.format(n) : trPara2.format(n); }
+
+  // Akis semasinda cok buyuk tutarlar kutuyu tasirmasin
+  function kisaTl(n) {
+    if (n >= 1e9) return trPara2.format(n / 1e9) + " mlr ₺";
+    if (n >= 1e6) return trPara2.format(n / 1e6) + " mn ₺";
+    return tl(n);
+  }
+  function kisaUsd(n) {
+    if (n >= 1e9) return "$" + trPara2.format(n / 1e9) + " mlr";
+    if (n >= 1e6) return "$" + trPara2.format(n / 1e6) + " mn";
+    return usd(n);
+  }
 
   // 2007'de, 2013'te, 2020'de ... Turkce yil eki
   function yilEki(yil) {
@@ -582,6 +618,8 @@
       $("satirlar").innerHTML = "";
       $("akis").innerHTML = "";
       $("uyari").hidden = true;
+      $("tutarUyari").hidden = true;
+      $("tutarNot").textContent = "";
       return;
     }
 
@@ -600,13 +638,13 @@
       '<span class="tag"><b>' + trPara.format(tlNow / tutarTL) + "×</b> katına çıktı</span>";
 
     $("akis").innerHTML =
-      dugum(0, "", rozet("tl", "₺", "#ff385c"), tl(tutarTL), donem.replace(/'(de|da|te|ta)$/, "")) +
+      dugum(0, "", rozet("tl", "₺", "#ff385c"), kisaTl(tutarTL), donem.replace(/'(de|da|te|ta)$/, "")) +
       ok(0, "kur " + kurKisa(k.deger)) +
-      dugum(1, "usd", rozet("usd", "$", "#0e8a4f"), usd(usdThen), "o günkü dolar") +
+      dugum(1, "usd", rozet("usd", "$", "#0e8a4f"), kisaUsd(usdThen), "o günkü dolar") +
       ok(1, "ABD enf. %" + trPara.format((enflasyonKat - 1) * 100)) +
-      dugum(2, "usd", rozet("usd", "$", "#0e8a4f"), usd(usdNow), "bugünkü dolar") +
+      dugum(2, "usd", rozet("usd", "$", "#0e8a4f"), kisaUsd(usdNow), "bugünkü dolar") +
       ok(2, "kur " + kurKisa(GUNCEL_KUR)) +
-      dugum(3, "son", rozet("now", "₺", "#ffffff"), tl(tlNow), "bugün");
+      dugum(3, "son", rozet("now", "₺", "#ffffff"), kisaTl(tlNow), "bugün");
 
     var kart = $("sonuc");
     if (animasyonlu && !azHareket) {
@@ -624,9 +662,28 @@
       line("Bugünkü kur (1 $)", kurYaz(GUNCEL_KUR)) +
       line("Bugünkü karşılığı", tl(tlNow), " total");
 
+    // Eski TL kutusunun ne yaptigini aninda goster
+    $("tutarNot").textContent = eskiTL
+      ? trPara.format(girilen) + " eski TL = " + tl(tutarTL) + " (bugünkü TL)"
+      : "";
+
+    // Tutar donem icin sasirtici derecede kucuk/buyukse tek tikla duzeltme oner
+    var uyariMetni = "", dugmeMetni = "";
+    if (eskiDonem && eskiTL && usdThen < 1) {
+      uyariMetni = "Bu tutar " + yil + " için çok küçük: o gün " + usd(usdThen) +
+        " ederdi. Bugünkü TL cinsinden mi yazdın?";
+      dugmeMetni = "Bugünkü TL say";
+    } else if (eskiDonem && !eskiTL && usdThen > 500000) {
+      uyariMetni = "Bu tutar " + yil + " için çok büyük: o gün " + usd(usdThen) +
+        " ederdi. Eski TL cinsinden mi yazdın?";
+      dugmeMetni = "Eski TL say";
+    }
+    $("fixMetin").textContent = uyariMetni;
+    $("fixDugme").textContent = dugmeMetni;
+    $("tutarUyari").hidden = !uyariMetni;
+
     var uyarilar = [];
     if (!k.tam && !ay) uyarilar.push(yil + " için yılın mevcut aylarının ortalaması kullanıldı.");
-    if (eskiDonem && !eskiTL) uyarilar.push("Tutar yeni TL sayıldı; o dönemin fiyatlarını giriyorsan kutuyu işaretle.");
     $("uyari").innerHTML = uyarilar.join("<br>");
     $("uyari").hidden = uyarilar.length === 0;
 
@@ -702,6 +759,11 @@
       hesapla(true);
     });
   }
+
+  $("fixDugme").addEventListener("click", function () {
+    eskiEl.checked = !eskiEl.checked;
+    hesapla(true);
+  });
 
   $("git").addEventListener("click", function () {
     tutarEl.blur();

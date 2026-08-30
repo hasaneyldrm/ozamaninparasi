@@ -260,19 +260,21 @@
     color: var(--soft); margin-bottom: 10px;
   }
   .bubble .aciklama {
-    margin: 0 0 16px; padding-bottom: 15px; border-bottom: 1px solid var(--hair);
-    font-size: 13px; line-height: 1.6; color: var(--soft);
+    margin: 15px 0 0; padding-top: 13px; border-top: 1px solid var(--hair);
+    font-size: 12.5px; line-height: 1.5; color: var(--soft); text-align: center;
   }
-  .bubble .aciklama b { color: var(--ink); font-weight: 600; white-space: nowrap; }
   .mini { display: flex; align-items: flex-start; justify-content: center; gap: 10px 14px; flex-wrap: wrap; }
-  .mini .step { display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 0; }
+  .mini .step { display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 0; gap: 1px; }
+  .mini .rz { display: block; margin-bottom: 5px; }
   .mini .v { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .mini .v.tl { color: var(--rausch); }
   .mini .v.usd { color: var(--dolar); }
   .mini .v.eur { color: #1f5fbf; }
   .mini .v.son { font-size: 16px; }
   .mini .c { margin-top: 3px; font-size: 11.5px; line-height: 1.3; color: var(--soft); }
-  .mini .ar { display: flex; flex-direction: column; align-items: center; padding-top: 4px; }
+  .mini .ar { display: flex; flex-direction: column; align-items: center; }
+  .mini .ar .ik { height: 39px; display: flex; align-items: center; }
+  .mini .ar.trend .op { color: var(--dolar); font-weight: 600; }
   .mini .ar .op { margin-top: 4px; font-size: 11px; color: var(--soft); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
   .rb {
@@ -557,14 +559,35 @@
   var azHareket = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var sayacId = null;
 
+  function rozetSvg(tip) {
+    var renk = tip === "tl" ? "#ff385c" : (tip === "eur" ? "#1f5fbf" : "#0e8a4f");
+    var zemin = tip === "tl" ? "#fff1f3" : (tip === "eur" ? "#eaf0fb" : "#e9f7ef");
+    var sembol = tip === "tl" ? "₺" : (tip === "eur" ? "€" : "$");
+    return '<svg class="rz" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">' +
+      '<circle cx="17" cy="17" r="16" fill="' + zemin + '"/>' +
+      '<text x="17" y="22.5" text-anchor="middle" font-size="16" font-weight="700" fill="' + renk + '">' +
+      sembol + "</text></svg>";
+  }
+
+  function trendSvg() {
+    return '<svg width="30" height="18" viewBox="0 0 30 18" fill="none" aria-hidden="true">' +
+      '<path d="M2 15.5l7.5-7 5 4L26 3" stroke="#0e8a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<path d="M19.5 3H27v7.5" stroke="#0e8a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+
   function miniAdim(deger, sinif, etiket) {
-    return '<span class="step"><span class="v ' + sinif + '">' + deger + '</span>' +
+    var tip = sinif.indexOf("tl") > -1 ? "tl" : (sinif.indexOf("eur") > -1 ? "eur" : "usd");
+    return '<span class="step">' + rozetSvg(tip) +
+      '<span class="v ' + sinif + '">' + deger + '</span>' +
       '<span class="c">' + etiket + "</span></span>";
   }
 
-  function miniOk(etiket) {
-    return '<span class="ar"><svg width="16" height="8" viewBox="0 0 18 8" fill="none" aria-hidden="true">' +
-      '<path d="M0 4h15M12 1l3 3-3 3" stroke="#c3c3c3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+  function miniOk(etiket, trend) {
+    var ikon = trend
+      ? trendSvg()
+      : '<svg width="18" height="8" viewBox="0 0 20 8" fill="none" aria-hidden="true">' +
+        '<path d="M0 4h17M14 1l3 3-3 3" stroke="#c3c3c3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    return '<span class="ar' + (trend ? " trend" : "") + '"><span class="ik">' + ikon + "</span>" +
       '<span class="op">' + etiket + "</span></span>";
   }
 
@@ -602,28 +625,24 @@
       var enfYuzde = trPara.format((d.enflasyonKat - 1) * 100);
       var dolarBalon =
         '<div class="baslik">Dolar hesabı</div>' +
-        '<p class="aciklama">' + d.donemEkli + " " + tl(d.tutarTL) + ", o günün kuruyla <b>" +
-        usd(d.usdThen) + "</b> ediyordu. ABD'de fiyatlar o günden bugüne <b>%" + enfYuzde +
-        "</b> arttı; yani aynı alım gücü bugün <b>" + usd(d.usdNow) + "</b>.</p>" +
         '<div class="mini">' +
         miniAdim(tl(d.tutarTL), "tl", d.donem) +
         miniOk("kur " + kurYaz(d.kur).replace(" ₺", "")) +
         miniAdim(usd(d.usdThen), "usd", "o günkü dolar") +
-        miniOk("ABD enflasyonu +%" + enfYuzde) +
+        miniOk("+%" + enfYuzde, true) +
         miniAdim(usd(d.usdNow), "usd son", "bugünkü dolar") +
-        "</div>";
+        "</div>" +
+        '<p class="aciklama">ABD\'de fiyatlar o günden bugüne %' + enfYuzde + " arttı.</p>";
       var euroBalon =
         '<div class="baslik">Euro hesabı</div>' +
-        '<p class="aciklama">Hesap dolar üzerinden yapılır: ' + d.donemEkli + " girilen tutar, ABD enflasyonu (%" +
-        enfYuzde + ") eklenince bugün <b>" + usd(d.usdNow) + "</b> ediyor. Bugünkü kurlarla bu tutar <b>" +
-        tl(d.tlNow) + "</b> ya da <b>€" + trPara.format(d.tlNow / GUNCEL_EUR) + "</b>.</p>" +
         '<div class="mini">' +
         miniAdim(usd(d.usdNow), "usd", "bugünkü dolar") +
         miniOk("kur " + trPara2.format(GUNCEL_KUR)) +
         miniAdim(tl(d.tlNow), "tl", "bugünkü TL") +
         miniOk("kur " + trPara2.format(GUNCEL_EUR)) +
         miniAdim("€" + trPara.format(d.tlNow / GUNCEL_EUR), "eur son", "bugünkü euro") +
-        "</div>";
+        "</div>" +
+        '<p class="aciklama">Hesap dolar üzerinden yapılır; euro yalnızca son adımda çevrilir.</p>';
 
       parcalar = fxOge("usd", "$", usd(d.usdNow), "1 dolar = " + trPara2.format(GUNCEL_KUR) + " ₺", dolarBalon);
       if (GUNCEL_EUR) {

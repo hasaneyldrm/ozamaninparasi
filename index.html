@@ -138,30 +138,37 @@
     display: grid; grid-template-columns: 390px minmax(0, 1fr);
     gap: 36px; align-items: start; padding: 0 0 76px;
   }
-  @media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); gap: 22px; padding-bottom: 56px; } }
+  @media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); gap: 22px; padding-bottom: 56px; align-items: stretch; } }
   .layout > * { min-width: 0; }
   .tip { margin: 16px 2px 0; font-size: 13.5px; line-height: 1.5; color: var(--soft); }
   .col { display: block; }
 
-  .result { padding: 26px 28px 24px; }
-  @media (max-width: 560px) { .result { padding: 22px 20px 20px; } }
-  .lead { font-size: 15px; color: var(--soft); }
+  .result { padding: 30px 28px 24px; text-align: center; }
+  @media (max-width: 560px) { .result { padding: 24px 18px 20px; } }
+  .lead { font-size: 14px; color: var(--soft); line-height: 1.45; }
   .lead b { color: var(--ink); font-weight: 600; }
   .big {
-    margin: 6px 0 6px;
+    margin: 8px 0 14px;
     font-size: clamp(40px, 6.4vw, 62px); font-weight: 700;
     letter-spacing: -0.04em; line-height: 1.05;
     font-variant-numeric: tabular-nums; word-break: break-word;
   }
-  .sub { font-size: 14.5px; color: var(--soft); }
-  .usd-val { color: var(--dolar); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .sub { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; font-size: 14px; }
+  .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 999px; background: var(--wash); color: var(--soft);
+    font-size: 13.5px; white-space: nowrap;
+  }
+  .tag b { font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .tag.usd { background: var(--dolar-wash); color: #3f7f60; }
+  .tag.usd b { color: var(--dolar); }
   .note { margin-top: 14px; background: var(--wash); border-radius: 12px; padding: 10px 13px; font-size: 13.5px; color: var(--ink); }
   .note[hidden] { display: none; }
 
   /* ---- akis semasi ---- */
   .flow {
     display: flex; align-items: stretch; gap: 4px;
-    margin: 22px 0 6px; padding-top: 20px; border-top: 1px solid var(--hair);
+    margin: 24px 0 6px; padding-top: 22px; border-top: 1px solid var(--hair);
   }
   .node { flex: 1 1 0; min-width: 0; text-align: center; padding: 4px 2px; }
   .badge {
@@ -175,16 +182,16 @@
   .node .val.uzun { font-size: 13.5px; letter-spacing: -0.03em; }
   .node.son .val { color: var(--rausch); }
   .node.usd .val { color: var(--dolar); }
-  .node .cap { margin-top: 2px; font-size: 11.5px; line-height: 1.35; color: var(--soft); }
-  .arrow { flex: 0 0 auto; width: 56px; padding-top: 12px; text-align: center; }
-  .arrow .op { display: block; margin-top: 4px; font-size: 10.5px; line-height: 1.3; color: var(--soft); font-variant-numeric: tabular-nums; }
+  .node .cap { margin-top: 3px; font-size: 11.5px; line-height: 1.35; color: var(--soft); white-space: nowrap; }
+  .arrow { flex: 0 0 auto; width: 58px; padding-top: 12px; text-align: center; }
+  .arrow .op { display: block; margin-top: 5px; font-size: 11px; line-height: 1.35; color: var(--soft); font-variant-numeric: tabular-nums; }
   .arrow svg { opacity: .5; }
   @media (max-width: 620px) {
     .flow { flex-direction: column; align-items: stretch; gap: 0; }
     .node { display: flex; align-items: center; gap: 12px; text-align: left; padding: 6px 0; }
     .badge { margin: 0; flex: none; }
     .node .val, .node .val.uzun { font-size: 17px; }
-    .node .cap { margin: 0 0 0 auto; text-align: right; }
+    .node .cap { margin: 0 0 0 auto; text-align: right; white-space: normal; }
     .arrow {
       width: auto; padding: 0 0 0 18px; text-align: left;
       display: flex; align-items: center; gap: 12px; min-height: 26px;
@@ -198,7 +205,7 @@
   .detay { margin-top: 18px; border-top: 1px solid var(--hair); padding-top: 10px; }
   .detay summary {
     cursor: pointer; list-style: none; font-size: 13px; font-weight: 600; color: var(--soft);
-    padding: 4px 0; display: flex; align-items: center; gap: 6px;
+    padding: 6px 0; display: flex; align-items: center; justify-content: center; gap: 6px;
   }
   .detay summary::-webkit-details-marker { display: none; }
   .detay summary::after {
@@ -208,7 +215,7 @@
   .detay[open] summary::after { transform: rotate(-135deg) translate(-1px, -1px); }
   .detay summary:hover { color: var(--ink); }
   .card { border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-lg); background: #fff; }
-  .line { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 9px 0; font-size: 15px; }
+  .line { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 9px 0; font-size: 15px; text-align: left; }
   .line .k { color: var(--soft); }
   .line .v { font-weight: 500; white-space: nowrap; font-variant-numeric: tabular-nums; }
   .line.total { border-top: 1px solid var(--hair); margin-top: 8px; padding-top: 15px; font-size: 17px; }
@@ -446,11 +453,13 @@
   var trPara = new Intl.NumberFormat("tr-TR", { maximumFractionDigits: 0 });
   var trPara2 = new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   var trKur = new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+  var trKur3 = new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 
   function ayAdi(k) { return AYLAR[+k.slice(5, 7) - 1] + " " + k.slice(0, 4); }
   function tl(n) { return (n >= 1000 ? trPara.format(n) : trPara2.format(n)) + " ₺"; }
   function usd(n) { return "$" + (n >= 1000 ? trPara.format(n) : trPara2.format(n)); }
   function kurYaz(n) { return (n >= 10 ? trPara2.format(n) : trKur.format(n)) + " ₺"; }
+  function kurKisa(n) { return n < 1 ? trKur3.format(n) : trPara2.format(n); }
 
   // 2007'de, 2013'te, 2020'de ... Turkce yil eki
   function yilEki(yil) {
@@ -569,7 +578,7 @@
     if (!girilen || !k || !t) {
       $("lead").textContent = "";
       $("buyuk").textContent = "—";
-      $("buyukAlt").textContent = girilen ? "Bu dönem için veri yok." : "Bir tutar yaz.";
+      $("buyukAlt").innerHTML = '<span class="tag">' + (girilen ? "Bu dönem için veri yok" : "Bir tutar yaz") + "</span>";
       $("satirlar").innerHTML = "";
       $("akis").innerHTML = "";
       $("uyari").hidden = true;
@@ -586,16 +595,17 @@
 
     $("lead").innerHTML = "<b>" + donem + " " + girilenMetin + "</b> bugün";
     sayacYaz(tlNow, animasyonlu);
-    $("buyukAlt").innerHTML = '<b class="usd-val">' + usd(usdNow) + "</b> · " +
-      trPara.format(tlNow / tutarTL) + " katı";
+    $("buyukAlt").innerHTML =
+      '<span class="tag usd"><b>' + usd(usdNow) + "</b> bugünün doları</span>" +
+      '<span class="tag"><b>' + trPara.format(tlNow / tutarTL) + "×</b> katına çıktı</span>";
 
     $("akis").innerHTML =
       dugum(0, "", rozet("tl", "₺", "#ff385c"), tl(tutarTL), donem.replace(/'(de|da|te|ta)$/, "")) +
-      ok(0, "kur " + trKur.format(k.deger)) +
+      ok(0, "kur " + kurKisa(k.deger)) +
       dugum(1, "usd", rozet("usd", "$", "#0e8a4f"), usd(usdThen), "o günkü dolar") +
       ok(1, "ABD enf. %" + trPara.format((enflasyonKat - 1) * 100)) +
       dugum(2, "usd", rozet("usd", "$", "#0e8a4f"), usd(usdNow), "bugünkü dolar") +
-      ok(2, "kur " + trPara2.format(GUNCEL_KUR)) +
+      ok(2, "kur " + kurKisa(GUNCEL_KUR)) +
       dugum(3, "son", rozet("now", "₺", "#ffffff"), tl(tlNow), "bugün");
 
     var kart = $("sonuc");

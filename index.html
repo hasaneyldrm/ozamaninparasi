@@ -237,8 +237,6 @@
     transition: box-shadow .16s ease, border-color .16s ease;
   }
   .fx-item:hover, .fx-item:focus-visible { border-color: var(--ink); box-shadow: var(--shadow); }
-  .fx-i { color: #c2c2c2; margin-left: 2px; flex: none; transition: color .16s ease; }
-  .fx-item:hover .fx-i, .fx-item:focus .fx-i { color: var(--ink); }
   .fx-txt { display: flex; flex-direction: column; line-height: 1.25; text-align: left; }
   .fx-item b { font-size: 17px; color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
   .fx-sub { font-size: 12px; color: var(--soft); font-variant-numeric: tabular-nums; }
@@ -613,16 +611,10 @@
   }
 
   function fxOge(sinif, sembol, karsilik, kurMetni, balon) {
-    var ipucu = balon
-      ? '<svg class="fx-i" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-        '<circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.7"/>' +
-        '<path d="M12 10.8v6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>' +
-        '<circle cx="12" cy="7.6" r="1.15" fill="currentColor"/></svg>'
-      : "";
     return '<span class="fx-item" tabindex="0">' +
       '<span class="rb ' + sinif + '">' + sembol + "</span>" +
       '<span class="fx-txt"><b>' + karsilik + '</b><span class="fx-sub">' + kurMetni + "</span></span>" +
-      ipucu + (balon ? '<span class="bubble" role="tooltip">' + balon + "</span>" : "") + "</span>";
+      (balon ? '<span class="bubble" role="tooltip">' + balon + "</span>" : "") + "</span>";
   }
 
   function kurSeridiYaz(d) {

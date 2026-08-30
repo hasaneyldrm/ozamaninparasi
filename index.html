@@ -171,13 +171,46 @@
   }
   .copy:hover { background: var(--wash); }
 
-  /* ---- aciklama ---- */
-  .how { border-top: 1px solid var(--hair); background: var(--wash); }
-  .how .shell { padding-top: 34px; padding-bottom: 40px; max-width: 760px; }
-  .how h2 { margin: 0 0 12px; font-size: 19px; font-weight: 700; }
-  .how p { margin: 0 0 10px; font-size: 15px; line-height: 1.55; color: var(--soft); }
-  .how p:last-child { margin-bottom: 0; }
-  .how b { color: var(--ink); font-weight: 600; }
+  /* ---- alt bilgi ---- */
+  .foot { border-top: 1px solid var(--hair); padding: 20px 0 34px; }
+  .foot .shell { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--soft); }
+  .foot-link { border: 0; background: none; padding: 0; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ---- modal ---- */
+  .modal { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .modal[hidden] { display: none; }
+  .modal-bg { position: absolute; inset: 0; background: rgba(0, 0, 0, .5); animation: fade .18s ease; }
+  .modal-card {
+    position: relative; width: 100%; max-width: 570px; max-height: 86vh; overflow-y: auto;
+    background: #fff; border-radius: 16px; box-shadow: 0 12px 40px rgba(0, 0, 0, .3);
+    animation: pop .2s ease; outline: none;
+  }
+  .modal-head {
+    position: sticky; top: 0; background: #fff; border-bottom: 1px solid var(--hair);
+    border-radius: 16px 16px 0 0; padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+  }
+  .modal-head h2 { margin: 0 auto; padding-right: 32px; font-size: 16px; font-weight: 700; }
+  .modal-x {
+    flex: none; width: 32px; height: 32px; border-radius: 50%; border: 0; background: none;
+    cursor: pointer; display: grid; place-items: center;
+  }
+  .modal-x:hover { background: var(--wash); }
+  .modal-x:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .modal-body { padding: 20px 24px 26px; }
+  .steps { margin: 0 0 18px; padding-left: 20px; display: grid; gap: 12px; font-size: 15px; line-height: 1.55; color: var(--soft); }
+  .steps li::marker { color: var(--rausch); font-weight: 700; }
+  .steps b { color: var(--ink); font-weight: 600; }
+  .modal-note { margin: 0 0 12px; font-size: 14px; line-height: 1.55; color: var(--soft); }
+  .modal-src { margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--hair); font-size: 12.5px; color: var(--soft); }
+  @keyframes fade { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes pop { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+  @media (max-width: 560px) {
+    .modal { padding: 0; align-items: flex-end; }
+    .modal-card { max-width: none; max-height: 88vh; border-radius: 18px 18px 0 0; }
+    .modal-head { border-radius: 18px 18px 0 0; }
+    @keyframes pop { from { transform: translateY(100%) } to { transform: none } }
+  }
+
 </style>
 </head>
 <body>
@@ -193,7 +226,7 @@
       </svg>
       <span class="word"><b>o zamanın</b> parası</span>
     </a>
-    <button class="pill-link" id="nasil" type="button" aria-label="Nasıl hesaplanıyor?">
+    <button class="pill-link" id="nasil" type="button" data-ac aria-label="Nasıl hesaplanıyor?">
       <span class="pill-text">Nasıl hesaplanıyor?</span>
       <svg class="pill-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <circle cx="12" cy="12" r="9.2" stroke="#222" stroke-width="1.8"/>
@@ -261,17 +294,41 @@
   </div>
 </main>
 
-<section class="how" id="aciklama">
+<footer class="foot">
   <div class="shell">
-    <h2>Nasıl hesaplanıyor?</h2>
-    <p>Girdiğin tutar önce <b>o dönemin ortalama dolar kuruyla</b> dolara çevriliyor. Ay seçmezsen
-      o yılın 12 aylık ortalaması kullanılıyor.</p>
-    <p>Sonra bu dolar tutarı <b>ABD tüketici fiyat endeksiyle</b> bugüne taşınıyor; yani doların
-      kendi satın alma gücü kaybı hesaba katılıyor.</p>
-    <p>Son adımda <b>güncel kurla</b> tekrar TL'ye dönülüyor. Kaynak: <span id="kurKaynak"></span>
-      ve <span id="tufeKaynak"></span>. Veri: <span id="guncelleme"></span>. Sonuçlar yaklaşıktır.</p>
+    <span>Sonuçlar yaklaşıktır. Veri: <span id="guncelleme"></span></span>
+    <button class="foot-link" type="button" data-ac>Nasıl hesaplanıyor?</button>
   </div>
-</section>
+</footer>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-bg" data-kapat></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-baslik" tabindex="-1">
+    <div class="modal-head">
+      <button class="modal-x" type="button" data-kapat aria-label="Kapat">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" stroke="#222" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <h2 id="modal-baslik">Nasıl hesaplanıyor?</h2>
+    </div>
+    <div class="modal-body">
+      <ol class="steps">
+        <li><b>Dolara çevriliyor.</b> Girdiğin tutar, o dönemin ortalama dolar kuruna bölünüyor.
+          Ay seçmezsen o yılın 12 aylık ortalaması kullanılıyor.</li>
+        <li><b>Bugüne taşınıyor.</b> Bulunan dolar tutarı, ABD tüketici fiyat endeksiyle (TÜFE)
+          bugünkü dolara çevriliyor; yani doların kendi satın alma gücü kaybı hesaba katılıyor.</li>
+        <li><b>TL'ye dönülüyor.</b> Son adımda güncel kurla tekrar TL'ye çevriliyor.</li>
+      </ol>
+      <p class="modal-note">Neden dolar? Türkiye'nin uzun dönemli resmî enflasyon serisi yerine
+        kur + ABD enflasyonu kullanmak, "o gün bu parayla kaç dolar alırdım, o dolar bugün ne eder"
+        sorusunun daha sezgisel bir cevabını veriyor.</p>
+      <p class="modal-note">2005'te paradan 6 sıfır atıldı; 2005 öncesi yıllarda formda çıkan
+        "eski TL" kutusu, girdiğin tutarı 1.000.000'e bölüyor.</p>
+      <p class="modal-src">Kur: <span id="kurKaynak"></span> · ABD TÜFE: <span id="tufeKaynak"></span></p>
+    </div>
+  </div>
+</div>
 
 <script src="data.js"></script>
 <script>
@@ -494,8 +551,33 @@
     hesapla();
     $("sonuc").scrollIntoView({ behavior: "smooth", block: "start" });
   });
-  $("nasil").addEventListener("click", function () {
-    $("aciklama").scrollIntoView({ behavior: "smooth", block: "start" });
+  var modal = $("modal"), sonOdak = null;
+
+  function modalAc(tetikleyen) {
+    sonOdak = tetikleyen || null;
+    modal.hidden = false;
+    document.body.style.overflow = "hidden";
+    var kart = modal.querySelector(".modal-card");
+    if (kart) kart.focus();
+  }
+
+  function modalKapat() {
+    modal.hidden = true;
+    document.body.style.overflow = "";
+    if (sonOdak && sonOdak.focus) sonOdak.focus();
+  }
+
+  var acanlar = document.querySelectorAll("[data-ac]");
+  for (var a = 0; a < acanlar.length; a++) {
+    (function (dugme) {
+      dugme.addEventListener("click", function () { modalAc(dugme); });
+    })(acanlar[a]);
+  }
+  modal.addEventListener("click", function (e) {
+    if (e.target.closest && e.target.closest("[data-kapat]")) modalKapat();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !modal.hidden) modalKapat();
   });
 
   $("paylas").addEventListener("click", function () {

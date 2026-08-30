@@ -185,43 +185,6 @@
   .note { margin-top: 14px; background: var(--wash); border-radius: 12px; padding: 10px 13px; font-size: 13.5px; color: var(--ink); }
   .note[hidden] { display: none; }
 
-  /* ---- akis semasi ---- */
-  .flow {
-    display: flex; align-items: stretch; gap: 4px;
-    margin: 24px 0 6px; padding-top: 22px; border-top: 1px solid var(--hair);
-  }
-  .node { flex: 1 1 0; min-width: 0; text-align: center; padding: 4px 2px; }
-  .badge {
-    width: 38px; height: 38px; margin: 0 auto 8px; border-radius: 50%;
-    display: grid; place-items: center; background: var(--wash);
-  }
-  .badge.tl { background: #fff1f3; }
-  .badge.usd { background: var(--dolar-wash); }
-  .badge.now { background: linear-gradient(to bottom right, #e61e4d, #d70466); }
-  .node .val { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .node .val.uzun { font-size: 13.5px; letter-spacing: -0.03em; }
-  .node .val.cokuzun { font-size: 12px; letter-spacing: -0.03em; }
-  .node.son .val { color: var(--rausch); }
-  .node.usd .val { color: var(--dolar); }
-  .node .cap { margin-top: 3px; font-size: 11.5px; line-height: 1.35; color: var(--soft); white-space: nowrap; }
-  .arrow { flex: 0 0 auto; width: 62px; padding-top: 12px; text-align: center; }
-  .arrow .op { display: block; margin-top: 5px; font-size: 11px; line-height: 1.35; color: var(--soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .arrow svg { opacity: .5; }
-  @media (max-width: 620px) {
-    .flow { flex-direction: column; align-items: stretch; gap: 0; }
-    .node { display: flex; align-items: center; gap: 12px; text-align: left; padding: 6px 0; }
-    .badge { margin: 0; flex: none; }
-    .node .val, .node .val.uzun, .node .val.cokuzun { font-size: 17px; }
-    .node .cap { margin: 0 0 0 auto; text-align: right; white-space: normal; }
-    .arrow {
-      width: auto; padding: 0 0 0 18px; text-align: left;
-      display: flex; align-items: center; gap: 12px; min-height: 26px;
-    }
-    .arrow svg { display: none; }
-    .arrow::before { content: ""; width: 2px; align-self: stretch; background: var(--hair); border-radius: 2px; }
-    .arrow .op { margin: 0; white-space: nowrap; font-size: 11.5px; }
-  }
-
   /* ---- katlanabilir dokum ---- */
   .detay { margin-top: 14px; padding-top: 4px; }
   .detay summary {
@@ -254,15 +217,45 @@
   .foot-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
   /* ---- kart ici guncel kur satiri ---- */
   .fx {
+    position: relative;
     display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
-    gap: 12px 24px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--hair);
+    gap: 10px 16px; margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--hair);
     font-size: 13px; color: var(--soft);
   }
-  .fx-item { display: inline-flex; align-items: center; gap: 9px; white-space: nowrap; }
+  .fx-item {
+    display: inline-flex; align-items: center; gap: 10px;
+    white-space: nowrap; padding: 8px 12px; border-radius: 12px; cursor: default; outline: none;
+    transition: background .15s ease;
+  }
+  .fx-item:hover, .fx-item:focus-visible { background: var(--wash); }
   .fx-txt { display: flex; flex-direction: column; line-height: 1.25; text-align: left; }
-  .fx-item b { font-size: 15px; color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
-  .fx-sub { font-size: 11.5px; color: var(--soft); font-variant-numeric: tabular-nums; }
-  .fx-item .rb { width: 26px; height: 26px; font-size: 13px; }
+  .fx-item b { font-size: 17px; color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .fx-sub { font-size: 12px; color: var(--soft); font-variant-numeric: tabular-nums; }
+  .fx-item .rb { width: 30px; height: 30px; font-size: 14px; }
+  .fx-note { margin: 15px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--soft); }
+
+  /* ---- ipucu balonu ---- */
+  .bubble {
+    position: absolute; left: 0; right: 0; bottom: calc(100% + 8px);
+    z-index: 5; transform: translateY(6px);
+    background: #222; color: #fff; border-radius: 14px; padding: 14px 16px;
+    font-size: 12.5px; line-height: 1.5; text-align: left; white-space: normal;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .3);
+    opacity: 0; visibility: hidden; transition: opacity .16s ease, transform .16s ease;
+  }
+  .fx-item:hover .bubble, .fx-item:focus .bubble, .fx-item:focus-within .bubble {
+    opacity: 1; visibility: visible; transform: translateY(0);
+  }
+  .bubble .baslik {
+    font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    color: #8f8f8f; margin-bottom: 7px;
+  }
+  .bubble .row { display: flex; justify-content: space-between; gap: 16px; padding: 2px 0; }
+  .bubble .row span { color: #b4b4b4; }
+  .bubble .row b { font-size: 12.5px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .bubble .row.sum { margin-top: 6px; padding-top: 7px; border-top: 1px solid #3d3d3d; }
+  .bubble .row.sum span { color: #ededed; }
+
   .rb {
     width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
     font-size: 12px; font-weight: 700; flex: none;
@@ -298,16 +291,15 @@
   .steps b { color: var(--ink); font-weight: 600; }
   .modal-note { margin: 0 0 12px; font-size: 14px; line-height: 1.55; color: var(--soft); }
   .modal-src { margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--hair); font-size: 12.5px; color: var(--soft); }
-  .anim .node, .anim .arrow { animation: rise .42s cubic-bezier(.2, .7, .3, 1) both; }
-  .anim .node { animation-delay: calc(var(--i, 0) * 60ms); }
-  .anim .arrow { animation-delay: calc(var(--i, 0) * 60ms + 30ms); }
+  .anim .fx-item { animation: rise .4s cubic-bezier(.2, .7, .3, 1) both; }
+  .anim .fx-item:nth-child(2) { animation-delay: 70ms; }
   .anim .big { animation: pop-num .38s ease both; }
-  @keyframes rise { from { opacity: 0; transform: translateY(9px) } to { opacity: 1; transform: none } }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
   @keyframes pop-num { from { opacity: .4; transform: scale(.985) } to { opacity: 1; transform: none } }
   .chip:active { transform: scale(.97); }
   .copy:active, .pill-link:active { transform: scale(.99); }
   @media (prefers-reduced-motion: reduce) {
-    .anim .node, .anim .arrow, .anim .big, .modal-bg, .modal-card { animation: none !important; }
+    .anim .fx-item, .anim .big, .modal-bg, .modal-card { animation: none !important; }
   }
   @keyframes fade { from { opacity: 0 } to { opacity: 1 } }
   @keyframes pop { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
@@ -400,8 +392,8 @@
       <div class="big" id="buyuk">—</div>
       <div class="sub" id="buyukAlt"></div>
       <div class="note" id="uyari" hidden></div>
-      <div class="flow" id="akis"></div>
       <div class="fx" id="fxSatir"></div>
+      <p class="fx-note">Dolar tutarları ABD enflasyonuyla bugüne taşınmıştır — üzerine gelince hesabı görebilirsin.</p>
 
       <details class="detay">
         <summary>Detaylı döküm</summary>
@@ -482,23 +474,12 @@
   var trPara = new Intl.NumberFormat("tr-TR", { maximumFractionDigits: 0 });
   var trPara2 = new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   var trKur = new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 4 });
-  var trKur3 = new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 
   function ayAdi(k) { return AYLAR[+k.slice(5, 7) - 1] + " " + k.slice(0, 4); }
   function tl(n) { return (n >= 1000 ? trPara.format(n) : trPara2.format(n)) + " ₺"; }
   function usd(n) { return "$" + (n >= 1000 ? trPara.format(n) : trPara2.format(n)); }
   function kurYaz(n) { return (n >= 10 ? trPara2.format(n) : trKur.format(n)) + " ₺"; }
-  function kurKisa(n) { return n < 1 ? trKur3.format(n) : trPara2.format(n); }
 
-  // Akis semasinda cok buyuk tutarlar kutuyu tasirmasin
-  function kisaTl(n) {
-    if (n >= 1e9) return trPara2.format(n / 1e9) + " mlr ₺";
-    return tl(n);
-  }
-  function kisaUsd(n) {
-    if (n >= 1e9) return "$" + trPara2.format(n / 1e9) + " mlr";
-    return usd(n);
-  }
 
   // 2007'de, 2013'te, 2020'de ... Turkce yil eki
   function yilEki(yil) {
@@ -559,22 +540,8 @@
   var azHareket = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var sayacId = null;
 
-  function rozet(sinif, sembol, renk) {
-    return '<div class="badge ' + sinif + '"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">' +
-      '<text x="12" y="18.5" text-anchor="middle" font-size="17" font-weight="700" fill="' + renk + '">' + sembol + "</text></svg></div>";
-  }
-
-  function dugum(i, sinif, rozetHtml, deger, etiket) {
-    var uzun = deger.length > 12 ? " cokuzun" : (deger.length > 8 ? " uzun" : "");
-    return '<div class="node ' + sinif + '" style="--i:' + i + '">' + rozetHtml +
-      '<div class="val' + uzun + '">' + deger + '</div><div class="cap">' + etiket + "</div></div>";
-  }
-
-  function ok(i, etiket) {
-    return '<div class="arrow" style="--i:' + i + '" aria-hidden="true">' +
-      '<svg width="22" height="12" viewBox="0 0 24 14" fill="none">' +
-      '<path d="M1 7h20M16.5 2.5L21 7l-4.5 4.5" stroke="#222" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-      '<span class="op">' + etiket + "</span></div>";
+  function balonSatir(k, v, sinif) {
+    return '<div class="row' + (sinif || "") + '"><span>' + k + "</span><b>" + v + "</b></div>";
   }
 
   function sayacYaz(hedef, animasyonlu) {
@@ -595,19 +562,37 @@
     sayacId = requestAnimationFrame(adim);
   }
 
-  function fxOge(sinif, sembol, karsilik, kurMetni) {
-    return '<span class="fx-item"><span class="rb ' + sinif + '">' + sembol + "</span>" +
-      '<span class="fx-txt"><b>' + karsilik + '</b><span class="fx-sub">' + kurMetni + "</span></span></span>";
+  function fxOge(sinif, sembol, karsilik, kurMetni, balon) {
+    return '<span class="fx-item" tabindex="0">' +
+      '<span class="rb ' + sinif + '">' + sembol + "</span>" +
+      '<span class="fx-txt"><b>' + karsilik + '</b><span class="fx-sub">' + kurMetni + "</span></span>" +
+      (balon ? '<span class="bubble" role="tooltip">' + balon + "</span>" : "") + "</span>";
   }
 
-  function kurSeridiYaz(tlSonuc) {
-    var parcalar = fxOge("usd", "$",
-      tlSonuc ? usd(tlSonuc / GUNCEL_KUR) : "—",
-      "1 dolar = " + trPara2.format(GUNCEL_KUR) + " ₺");
-    if (GUNCEL_EUR) {
-      parcalar += fxOge("eur", "€",
-        tlSonuc ? "€" + trPara.format(tlSonuc / GUNCEL_EUR) : "—",
-        "1 euro = " + trPara2.format(GUNCEL_EUR) + " ₺");
+  function kurSeridiYaz(d) {
+    var parcalar;
+    if (!d) {
+      parcalar = fxOge("usd", "$", "—", "1 dolar = " + trPara2.format(GUNCEL_KUR) + " ₺", "");
+      if (GUNCEL_EUR) parcalar += fxOge("eur", "€", "—", "1 euro = " + trPara2.format(GUNCEL_EUR) + " ₺", "");
+    } else {
+      var dolarBalon =
+        '<div class="baslik">Dolar hesabı</div>' +
+        balonSatir(d.donem + " tutarı", tl(d.tutarTL)) +
+        balonSatir("O günkü kur", "1 $ = " + kurYaz(d.kur)) +
+        balonSatir("O gün ederi", usd(d.usdThen)) +
+        balonSatir("ABD enflasyonu", "+%" + trPara.format((d.enflasyonKat - 1) * 100)) +
+        balonSatir("Bugünkü doları", usd(d.usdNow), " sum");
+      var euroBalon =
+        '<div class="baslik">Euro hesabı</div>' +
+        balonSatir("Bugünkü karşılığı", tl(d.tlNow)) +
+        balonSatir("Bugünkü kur", "1 € = " + trPara2.format(GUNCEL_EUR) + " ₺") +
+        balonSatir("Euro cinsinden", "€" + trPara.format(d.tlNow / GUNCEL_EUR), " sum");
+
+      parcalar = fxOge("usd", "$", usd(d.usdNow), "1 dolar = " + trPara2.format(GUNCEL_KUR) + " ₺", dolarBalon);
+      if (GUNCEL_EUR) {
+        parcalar += fxOge("eur", "€", "€" + trPara.format(d.tlNow / GUNCEL_EUR),
+          "1 euro = " + trPara2.format(GUNCEL_EUR) + " ₺", euroBalon);
+      }
     }
     parcalar += '<span class="fx-day">' + KUR_TARIH.split("-").reverse().join(".") + " kuru</span>";
     $("fxSatir").innerHTML = parcalar;
@@ -637,11 +622,10 @@
       $("buyuk").textContent = "—";
       $("buyukAlt").innerHTML = '<span class="tag">' + (girilen ? "Bu dönem için veri yok" : "Bir tutar yaz") + "</span>";
       $("satirlar").innerHTML = "";
-      $("akis").innerHTML = "";
       $("uyari").hidden = true;
       $("tutarUyari").hidden = true;
       $("tutarNot").textContent = "";
-      kurSeridiYaz(0);
+      kurSeridiYaz(null);
       return;
     }
 
@@ -658,16 +642,11 @@
     $("buyukAlt").innerHTML =
       '<span class="tag"><b>' + trPara.format(tlNow / tutarTL) + "×</b> katına çıktı</span>";
 
-    $("akis").innerHTML =
-      dugum(0, "", rozet("tl", "₺", "#ff385c"), kisaTl(tutarTL), donem.replace(/'(de|da|te|ta)$/, "")) +
-      ok(0, "÷ " + kurKisa(k.deger) + " ₺") +
-      dugum(1, "usd", rozet("usd", "$", "#0e8a4f"), kisaUsd(usdThen), "o günkü dolar") +
-      ok(1, "ABD enf. %" + trPara.format((enflasyonKat - 1) * 100)) +
-      dugum(2, "usd", rozet("usd", "$", "#0e8a4f"), kisaUsd(usdNow), "bugünkü dolar") +
-      ok(2, "× " + kurKisa(GUNCEL_KUR) + " ₺") +
-      dugum(3, "son", rozet("now", "₺", "#ffffff"), kisaTl(tlNow), "bugün");
-
-    kurSeridiYaz(tlNow);
+    kurSeridiYaz({
+      donem: donem.replace(/'(de|da|te|ta)$/, ""),
+      tutarTL: tutarTL, kur: k.deger, usdThen: usdThen,
+      enflasyonKat: enflasyonKat, usdNow: usdNow, tlNow: tlNow
+    });
 
     var kart = $("sonuc");
     if (animasyonlu && !azHareket) {

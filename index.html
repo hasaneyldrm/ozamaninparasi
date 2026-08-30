@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#ffffff">
 <meta property="og:title" content="O Zamanın Parası">
 <meta property="og:description" content="1997'den bugüne: o zamanki paran bugün ne eder?">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>₺</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='none' stroke='%23FF385C' stroke-width='3'/><path d='M16 8v8.5l5 3' fill='none' stroke='%23FF385C' stroke-width='3' stroke-linecap='round'/></svg>">
 <style>
   *, *::before, *::after { box-sizing: border-box; }
   :root {
@@ -16,134 +16,207 @@
     --soft: #717171;
     --line: #dddddd;
     --hair: #ebebeb;
-    --accent: #ff385c;
+    --wash: #f7f7f7;
+    --rausch: #ff385c;
+    --shadow: 0 6px 16px rgba(0, 0, 0, .12);
+    --shadow-lg: 0 8px 28px rgba(0, 0, 0, .14);
   }
   html { -webkit-text-size-adjust: 100%; }
   body {
     margin: 0;
-    padding: 0 24px calc(56px + env(safe-area-inset-bottom));
     background: #fff;
     color: var(--ink);
-    font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font: 16px/1.45 "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 520px; margin: 0 auto; }
+  .shell { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  @media (max-width: 560px) { .shell { padding: 0 20px; } }
 
-  header { padding: 56px 0 28px; }
-  h1 { margin: 0 0 8px; font-size: 30px; line-height: 1.2; letter-spacing: -0.025em; font-weight: 700; }
-  header p { margin: 0; color: var(--soft); font-size: 15px; }
-
-  form { display: grid; gap: 18px; }
-  .field label { display: block; font-size: 13px; font-weight: 600; color: var(--soft); margin-bottom: 6px; }
-  .field label .opt { font-weight: 400; }
-  input[type="text"], select {
-    width: 100%;
-    font: inherit;
-    color: var(--ink);
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 13px 14px;
-    outline: none;
-    appearance: none;
-    -webkit-appearance: none;
+  /* ---- header ---- */
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    background: #fff; border-bottom: 1px solid var(--hair);
   }
-  input[type="text"] { font-size: 24px; font-weight: 600; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
-  input:focus, select:focus { border-color: var(--ink); }
-  select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23717171' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    padding-right: 38px;
+  .topbar .shell { display: flex; align-items: center; justify-content: space-between; height: 76px; }
+  @media (max-width: 560px) { .topbar .shell { height: 62px; } }
+  .brand { display: flex; align-items: center; gap: 9px; color: var(--rausch); font-weight: 700; font-size: 17px; letter-spacing: -0.02em; }
+  .brand svg { display: block; flex: none; }
+  .brand span { white-space: nowrap; }
+  @media (max-width: 420px) { .brand span { font-size: 15px; } }
+  .pill-link {
+    border: 1px solid var(--line); background: #fff; border-radius: 999px;
+    padding: 9px 15px; font: inherit; font-size: 14px; font-weight: 600; color: var(--ink);
+    cursor: pointer; transition: box-shadow .18s ease;
   }
-  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .pill-link:hover { box-shadow: var(--shadow); }
+  @media (max-width: 480px) { .pill-link { padding: 8px 13px; font-size: 13px; } }
 
-  .old {
-    display: flex; align-items: flex-start; gap: 9px;
-    font-size: 14px; color: var(--soft); cursor: pointer;
+  /* ---- hero ---- */
+  .hero { padding: 44px 0 26px; max-width: 620px; }
+  @media (max-width: 560px) { .hero { padding: 30px 0 20px; } }
+  h1 { margin: 0 0 10px; font-size: 34px; line-height: 1.15; letter-spacing: -0.03em; font-weight: 700; }
+  @media (max-width: 560px) { h1 { font-size: 27px; } }
+  .hero p { margin: 0; color: var(--soft); font-size: 16px; line-height: 1.5; }
+
+  /* ---- arama cubugu ---- */
+  .searchbar {
+    display: flex; align-items: stretch;
+    background: #fff; border: 1px solid var(--line); border-radius: 999px;
+    box-shadow: var(--shadow); padding: 6px 6px 6px 0;
   }
-  .old input { width: 17px; height: 17px; margin: 2px 0 0; accent-color: var(--accent); flex: none; }
-  .old[hidden] { display: none; }
+  .seg {
+    flex: 1 1 0; min-width: 0; position: relative;
+    padding: 10px 6px 10px 22px; border-radius: 999px;
+    transition: background .18s ease;
+  }
+  .seg:hover { background: var(--wash); }
+  .seg:focus-within { background: #fff; box-shadow: 0 0 0 1px var(--line), var(--shadow); }
+  .seg + .seg::before {
+    content: ""; position: absolute; left: 0; top: 12px; bottom: 12px;
+    width: 1px; background: var(--hair);
+  }
+  .seg:hover::before, .seg:focus-within::before, .seg:hover + .seg::before, .seg:focus-within + .seg::before { background: transparent; }
+  .seg label { display: block; font-size: 12px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 2px; }
+  .seg label .opt { color: var(--soft); font-weight: 400; }
+  .seg input, .seg select {
+    width: 100%; border: 0; background: none; padding: 0; margin: 0;
+    font: inherit; font-size: 15px; color: var(--ink); outline: none;
+    appearance: none; -webkit-appearance: none; cursor: pointer;
+  }
+  .seg input { font-weight: 600; font-variant-numeric: tabular-nums; cursor: text; }
+  .seg input::placeholder { color: var(--soft); font-weight: 400; }
+  .go {
+    flex: none; align-self: center; width: 48px; height: 48px; margin-left: 4px;
+    border: 0; border-radius: 50%; cursor: pointer;
+    background: linear-gradient(to right, #e61e4d 0%, #e31c5f 50%, #d70466 100%);
+    display: grid; place-items: center;
+  }
+  .go:active { transform: scale(.96); }
+  @media (max-width: 720px) {
+    .searchbar { display: block; border-radius: 26px; padding: 0; }
+    .seg { padding: 14px 20px; border-radius: 26px; }
+    .seg + .seg::before { left: 20px; right: 20px; top: 0; bottom: auto; width: auto; height: 1px; }
+    .seg:hover::before, .seg:focus-within::before { background: var(--hair); }
+    .go { width: calc(100% - 24px); height: 50px; margin: 4px 12px 12px; border-radius: 14px; }
+  }
 
-  .result { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--hair); }
+  /* ---- sonuc ---- */
+  .grid { display: grid; grid-template-columns: 1fr 372px; gap: 48px; align-items: start; padding: 44px 0 72px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; gap: 28px; padding: 30px 0 56px; } }
+
   .lead { font-size: 15px; color: var(--soft); }
   .lead b { color: var(--ink); font-weight: 600; }
   .big {
-    margin: 6px 0 4px;
-    font-size: clamp(40px, 12vw, 52px);
-    font-weight: 700;
-    letter-spacing: -0.035em;
-    line-height: 1.1;
+    margin: 8px 0 6px;
+    font-size: clamp(40px, 11vw, 60px); font-weight: 700;
+    letter-spacing: -0.04em; line-height: 1.05;
     font-variant-numeric: tabular-nums;
   }
-  .sub { font-size: 14px; color: var(--soft); }
-
-  .rows { margin-top: 26px; }
-  .row {
-    display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
-    padding: 14px 0;
-    border-top: 1px solid var(--hair);
-    font-size: 15px;
+  .sub { font-size: 15px; color: var(--soft); }
+  .badge {
+    display: inline-block; margin-top: 18px;
+    background: var(--wash); border-radius: 999px; padding: 8px 14px;
+    font-size: 14px; color: var(--ink);
   }
-  .row .k { color: var(--soft); }
-  .row .v { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .badge[hidden] { display: none; }
 
-  .note { margin-top: 16px; font-size: 13px; color: var(--soft); }
-  .note[hidden] { display: none; }
-
+  .card {
+    border: 1px solid var(--line); border-radius: 14px; padding: 22px;
+    box-shadow: var(--shadow-lg); background: #fff;
+  }
+  .card h2 { margin: 0 0 14px; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+  .line { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 9px 0; font-size: 15px; }
+  .line .k { color: var(--soft); }
+  .line .v { font-weight: 500; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .line.total { border-top: 1px solid var(--hair); margin-top: 8px; padding-top: 16px; font-size: 16px; }
+  .line.total .k, .line.total .v { color: var(--ink); font-weight: 700; }
   .copy {
-    margin-top: 22px; padding: 0; border: 0; background: none; cursor: pointer;
-    font: inherit; font-size: 15px; font-weight: 600; color: var(--ink);
-    text-decoration: underline; text-underline-offset: 3px;
+    display: block; width: 100%; margin-top: 18px; padding: 13px;
+    border: 1px solid var(--ink); border-radius: 10px; background: #fff;
+    font: inherit; font-size: 15px; font-weight: 600; color: var(--ink); cursor: pointer;
   }
+  .copy:hover { background: var(--wash); }
 
-  footer { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--hair); font-size: 13px; color: var(--soft); line-height: 1.6; }
+  /* ---- aciklama ---- */
+  .how { border-top: 1px solid var(--hair); background: var(--wash); }
+  .how .shell { padding-top: 34px; padding-bottom: 40px; max-width: 760px; }
+  .how h2 { margin: 0 0 12px; font-size: 19px; font-weight: 700; }
+  .how p { margin: 0 0 10px; font-size: 15px; line-height: 1.55; color: var(--soft); }
+  .how p:last-child { margin-bottom: 0; }
+  .how b { color: var(--ink); font-weight: 600; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1>O zamanın parası</h1>
-    <p>Eski bir tutar bugün ne eder? Dolar kuru ve ABD enflasyonuyla hesaplanır.</p>
-  </header>
 
-  <form onsubmit="return false">
-    <div class="field">
-      <label for="tutar">Tutar (₺)</label>
+<div class="topbar">
+  <div class="shell">
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="13" fill="none" stroke="#ff385c" stroke-width="3"/>
+        <path d="M16 8v8.5l5 3" fill="none" stroke="#ff385c" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span>o zamanın parası</span>
+    </div>
+    <button class="pill-link" id="nasil" type="button">Nasıl hesaplanıyor?</button>
+  </div>
+</div>
+
+<main class="shell">
+  <div class="hero">
+    <h1>O zamanki paran bugün ne eder?</h1>
+    <p>Tutarı yaz, yılı seç. Dolar kuru ve ABD enflasyonuyla bugüne taşıyalım.</p>
+  </div>
+
+  <form class="searchbar" onsubmit="return false">
+    <div class="seg">
+      <label for="tutar">Tutar</label>
       <input id="tutar" type="text" inputmode="numeric" autocomplete="off" placeholder="50.000" value="50.000">
     </div>
-
-    <div class="pair">
-      <div class="field">
-        <label for="yil">Yıl</label>
-        <select id="yil"></select>
-      </div>
-      <div class="field">
-        <label for="ay">Ay <span class="opt">(opsiyonel)</span></label>
-        <select id="ay"></select>
-      </div>
+    <div class="seg">
+      <label for="yil">Yıl</label>
+      <select id="yil"></select>
     </div>
-
-    <label class="old" id="eskiKutu" hidden>
-      <input type="checkbox" id="eski" checked>
-      <span>Eski TL olarak gir (2005'te 6 sıfır atıldı)</span>
-    </label>
+    <div class="seg">
+      <label for="ay">Ay <span class="opt">· opsiyonel</span></label>
+      <select id="ay"></select>
+    </div>
+    <button class="go" id="git" type="button" aria-label="Hesapla">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 12h15M13 6l6 6-6 6" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
   </form>
 
-  <section class="result" aria-live="polite">
-    <div class="lead" id="lead"></div>
-    <div class="big" id="buyuk">—</div>
-    <div class="sub" id="buyukAlt"></div>
-    <div class="rows" id="satirlar"></div>
-    <div class="note" id="uyari" hidden></div>
-    <button class="copy" id="paylas" type="button">Bağlantıyı kopyala</button>
-  </section>
+  <section class="grid" id="sonuc" aria-live="polite">
+    <div>
+      <div class="lead" id="lead"></div>
+      <div class="big" id="buyuk">—</div>
+      <div class="sub" id="buyukAlt"></div>
+      <label class="badge" id="eskiKutu" hidden>
+        <input type="checkbox" id="eski" checked> Eski TL olarak gir (2005'te 6 sıfır atıldı)
+      </label>
+      <div class="badge" id="uyari" hidden></div>
+    </div>
 
-  <footer>
-    Tutar o dönemin ortalama dolar kuruyla dolara çevrilir, ABD enflasyonuyla bugüne taşınır,
-    güncel kurla TL'ye döner. Kaynak: <span id="kurKaynak"></span> ve <span id="tufeKaynak"></span>.
-    Veri: <span id="guncelleme"></span>.
-  </footer>
-</div>
+    <aside class="card">
+      <h2>Hesap dökümü</h2>
+      <div id="satirlar"></div>
+      <button class="copy" id="paylas" type="button">Bağlantıyı kopyala</button>
+    </aside>
+  </section>
+</main>
+
+<section class="how" id="aciklama">
+  <div class="shell">
+    <h2>Nasıl hesaplanıyor?</h2>
+    <p>Girdiğin tutar önce <b>o dönemin ortalama dolar kuruyla</b> dolara çevriliyor. Ay seçmezsen
+      o yılın 12 aylık ortalaması kullanılıyor.</p>
+    <p>Sonra bu dolar tutarı <b>ABD tüketici fiyat endeksiyle</b> bugüne taşınıyor; yani doların
+      kendi satın alma gücü kaybı hesaba katılıyor.</p>
+    <p>Son adımda <b>güncel kurla</b> tekrar TL'ye dönülüyor. Kaynak: <span id="kurKaynak"></span>
+      ve <span id="tufeKaynak"></span>. Veri: <span id="guncelleme"></span>. Sonuçlar yaklaşıktır.</p>
+  </div>
+</section>
 
 <script src="data.js"></script>
 <script>
@@ -170,9 +243,9 @@
   var trKur = new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 4 });
 
   function ayAdi(k) { return AYLAR[+k.slice(5, 7) - 1] + " " + k.slice(0, 4); }
-  function kurYaz(n) { return (n >= 10 ? trPara2.format(n) : trKur.format(n)) + " ₺"; }
   function tl(n) { return (n >= 1000 ? trPara.format(n) : trPara2.format(n)) + " ₺"; }
   function usd(n) { return "$" + (n >= 1000 ? trPara.format(n) : trPara2.format(n)); }
+  function kurYaz(n) { return (n >= 10 ? trPara2.format(n) : trKur.format(n)) + " ₺"; }
 
   // 2007'de, 2013'te, 2020'de ... Turkce yil eki
   function yilEki(yil) {
@@ -230,8 +303,8 @@
     ayEl.value = secili && ayEl.querySelector('option[value="' + secili + '"]') ? secili : "";
   }
 
-  function satir(k, v) {
-    return '<div class="row"><span class="k">' + k + '</span><span class="v">' + v + "</span></div>";
+  function line(k, v, sinif) {
+    return '<div class="line' + (sinif || "") + '"><span class="k">' + k + '</span><span class="v">' + v + "</span></div>";
   }
 
   function hesapla() {
@@ -252,7 +325,7 @@
     if (!girilen || !k || !t) {
       $("lead").textContent = "";
       $("buyuk").textContent = "—";
-      $("buyukAlt").textContent = girilen ? "Bu dönem için veri yok." : "Bir tutar gir.";
+      $("buyukAlt").textContent = girilen ? "Bu dönem için veri yok." : "Bir tutar yaz.";
       $("satirlar").innerHTML = "";
       $("uyari").hidden = true;
       return;
@@ -268,16 +341,19 @@
 
     $("lead").innerHTML = "<b>" + donem + " " + girilenMetin + "</b> bugün";
     $("buyuk").textContent = tl(tlNow);
-    $("buyukAlt").textContent = "eder, yani " + trPara.format(tlNow / tutarTL) + " katı";
+    $("buyukAlt").textContent = "eder, yani " + trPara.format(tlNow / tutarTL) + " katı.";
 
     $("satirlar").innerHTML =
-      satir("O günkü kurla (1 $ = " + kurYaz(k.deger) + ")", usd(usdThen)) +
-      satir("ABD enflasyonuyla (%" + trPara.format((enflasyonKat - 1) * 100) + ")", usd(usdNow)) +
-      satir("Bugünkü kurla (1 $ = " + kurYaz(GUNCEL_KUR) + ")", tl(tlNow));
+      line(donem.replace(/'(de|da|te|ta)$/, "") + " tutarı", tl(tutarTL)) +
+      line("O günkü kur (1 $)", kurYaz(k.deger)) +
+      line("Dolar karşılığı", usd(usdThen)) +
+      line("ABD enflasyonu (%" + trPara.format((enflasyonKat - 1) * 100) + ")", usd(usdNow)) +
+      line("Bugünkü kur (1 $)", kurYaz(GUNCEL_KUR)) +
+      line("Bugünkü karşılığı", tl(tlNow), " total");
 
     var uyarilar = [];
     if (!k.tam && !ay) uyarilar.push(yil + " için yılın mevcut aylarının ortalaması kullanıldı.");
-    if (eskiDonem && !eskiTL) uyarilar.push("Tutar yeni TL sayıldı. O dönemin fiyatlarını giriyorsan yukarıdaki kutuyu işaretle.");
+    if (eskiDonem && !eskiTL) uyarilar.push("Tutar yeni TL sayıldı; o dönemin fiyatlarını giriyorsan kutuyu işaretle.");
     $("uyari").innerHTML = uyarilar.join("<br>");
     $("uyari").hidden = uyarilar.length === 0;
 
@@ -326,6 +402,14 @@
   window.addEventListener("hashchange", function () {
     if (location.hash === sonHash) return;
     if (hashOku()) hesapla();
+  });
+
+  $("git").addEventListener("click", function () {
+    tutarEl.blur();
+    $("sonuc").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  $("nasil").addEventListener("click", function () {
+    $("aciklama").scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
   $("paylas").addEventListener("click", function () {

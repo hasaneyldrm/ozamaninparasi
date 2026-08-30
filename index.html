@@ -58,7 +58,7 @@
   }
 
   /* ---- hero ---- */
-  .hero { padding: 44px 0 26px; max-width: 620px; }
+  .hero { padding: 40px 0 24px; max-width: 640px; }
   @media (max-width: 560px) { .hero { padding: 30px 0 20px; } }
   h1 { margin: 0 0 10px; font-size: 34px; line-height: 1.15; letter-spacing: -0.03em; font-weight: 700; }
   @media (max-width: 560px) { h1 { font-size: 27px; } }
@@ -67,7 +67,7 @@
   /* ---- hesap kutusu ---- */
   .box {
     background: #fff; border: 1px solid var(--line); border-radius: 16px;
-    box-shadow: var(--shadow-lg); padding: 18px; max-width: 560px;
+    box-shadow: var(--shadow-lg); padding: 18px; width: 100%;
     display: grid; gap: 12px;
   }
   .box > * { min-width: 0; }
@@ -113,9 +113,10 @@
   .go:active { transform: scale(.995); }
 
   /* ---- ornek cipleri ---- */
-  .examples { display: flex; align-items: center; gap: 12px; margin-top: 16px; max-width: 720px; }
+  .examples { display: flex; align-items: center; gap: 14px; margin: 2px 0 22px; }
+  @media (max-width: 700px) { .examples { display: block; margin-bottom: 18px; } .examples .ex-label { display: block; margin-bottom: 8px; } }
   .ex-label { flex: none; font-size: 13px; font-weight: 600; color: var(--soft); }
-  .ex-row { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .ex-row { display: flex; gap: 8px; min-width: 0; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
   .ex-row::-webkit-scrollbar { display: none; }
   .chip {
     flex: none; border: 1px solid var(--line); background: #fff; border-radius: 999px;
@@ -129,38 +130,42 @@
     .ex-row { padding-bottom: 2px; }
   }
 
-  /* ---- sonuc ---- */
-  .grid { display: grid; grid-template-columns: 1fr 372px; gap: 48px; align-items: start; padding: 44px 0 72px; }
-  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; gap: 28px; padding: 30px 0 56px; } }
+  /* ---- iki kolonlu tek duzen ---- */
+  .layout {
+    display: grid; grid-template-columns: 390px minmax(0, 1fr);
+    gap: 36px; align-items: start; padding: 0 0 76px;
+  }
+  @media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); gap: 22px; padding-bottom: 56px; } }
+  .layout > * { min-width: 0; }
+  .tip { margin: 16px 2px 0; font-size: 13.5px; line-height: 1.5; color: var(--soft); }
+  .col { display: block; }
 
+  .result { padding: 26px 28px 24px; }
+  @media (max-width: 560px) { .result { padding: 22px 20px 20px; } }
   .lead { font-size: 15px; color: var(--soft); }
   .lead b { color: var(--ink); font-weight: 600; }
   .big {
-    margin: 8px 0 6px;
-    font-size: clamp(40px, 11vw, 60px); font-weight: 700;
+    margin: 6px 0 6px;
+    font-size: clamp(40px, 6.4vw, 62px); font-weight: 700;
     letter-spacing: -0.04em; line-height: 1.05;
-    font-variant-numeric: tabular-nums;
+    font-variant-numeric: tabular-nums; word-break: break-word;
   }
   .sub { font-size: 15px; color: var(--soft); }
-  .badge {
-    display: inline-block; margin-top: 18px;
-    background: var(--wash); border-radius: 999px; padding: 8px 14px;
-    font-size: 14px; color: var(--ink);
-  }
-  .badge[hidden] { display: none; }
+  .note { margin-top: 14px; background: var(--wash); border-radius: 12px; padding: 10px 13px; font-size: 13.5px; color: var(--ink); }
+  .note[hidden] { display: none; }
 
-  .card {
-    border: 1px solid var(--line); border-radius: 14px; padding: 22px;
-    box-shadow: var(--shadow-lg); background: #fff;
+  .rows-title {
+    margin: 24px 0 4px; padding-top: 18px; border-top: 1px solid var(--hair);
+    font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--soft);
   }
-  .card h2 { margin: 0 0 14px; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
-  .line { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 9px 0; font-size: 15px; }
+  .card { border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-lg); background: #fff; }
+  .line { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 9px 0; font-size: 15px; }
   .line .k { color: var(--soft); }
   .line .v { font-weight: 500; white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .line.total { border-top: 1px solid var(--hair); margin-top: 8px; padding-top: 16px; font-size: 16px; }
+  .line.total { border-top: 1px solid var(--hair); margin-top: 8px; padding-top: 15px; font-size: 17px; }
   .line.total .k, .line.total .v { color: var(--ink); font-weight: 700; }
   .copy {
-    display: block; width: 100%; margin-top: 18px; padding: 13px;
+    display: block; width: 100%; margin-top: 20px; padding: 13px;
     border: 1px solid var(--ink); border-radius: 10px; background: #fff;
     font: inherit; font-size: 15px; font-weight: 600; color: var(--ink); cursor: pointer;
   }
@@ -205,53 +210,55 @@
     <p>Tutarı yaz, yılı seç. Dolar kuru ve ABD enflasyonuyla bugüne taşıyalım.</p>
   </div>
 
-  <form class="box" onsubmit="return false">
-    <div class="field amount">
-      <label for="tutar">O zamanki tutar</label>
-      <div class="amount-in">
-        <span class="sym">₺</span>
-        <input id="tutar" type="text" size="1" inputmode="numeric" autocomplete="off" placeholder="50.000" value="50.000">
-      </div>
-    </div>
-
-    <div class="when">
-      <div class="field">
-        <label for="yil">Hangi yıl?</label>
-        <select id="yil"></select>
-      </div>
-      <div class="field">
-        <label for="ay">Ay <span class="opt">· opsiyonel</span></label>
-        <select id="ay"></select>
-      </div>
-    </div>
-
-    <label class="oldcheck" id="eskiKutu" hidden>
-      <input type="checkbox" id="eski" checked>
-      <span>Eski TL olarak yazdım <em>(2005'te 6 sıfır atıldı)</em></span>
-    </label>
-
-    <button class="go" id="git" type="button">Bugün ne eder?</button>
-  </form>
-
   <div class="examples" aria-label="Örnekler">
     <span class="ex-label">Deneyin:</span>
     <div class="ex-row" id="ornekler"></div>
   </div>
 
-  <section class="grid" id="sonuc" aria-live="polite">
-    <div>
+  <div class="layout">
+    <div class="col">
+      <form class="box" onsubmit="return false">
+      <div class="field amount">
+        <label for="tutar">O zamanki tutar</label>
+        <div class="amount-in">
+          <span class="sym">₺</span>
+          <input id="tutar" type="text" size="1" inputmode="numeric" autocomplete="off" placeholder="50.000" value="50.000">
+        </div>
+      </div>
+
+      <div class="when">
+        <div class="field">
+          <label for="yil">Hangi yıl?</label>
+          <select id="yil"></select>
+        </div>
+        <div class="field">
+          <label for="ay">Ay <span class="opt">· opsiyonel</span></label>
+          <select id="ay"></select>
+        </div>
+      </div>
+
+      <label class="oldcheck" id="eskiKutu" hidden>
+        <input type="checkbox" id="eski" checked>
+        <span>Eski TL olarak yazdım <em>(2005'te 6 sıfır atıldı)</em></span>
+      </label>
+
+      <button class="go" id="git" type="button">Bugün ne eder?</button>
+    </form>
+
+      <p class="tip">Ay seçmezsen o yılın 12 aylık ortalama kuru kullanılır.
+        2005 öncesi bir yıl seçtiğinde "eski TL" kutusu çıkar.</p>
+    </div>
+
+    <section class="card result" id="sonuc" aria-live="polite">
       <div class="lead" id="lead"></div>
       <div class="big" id="buyuk">—</div>
       <div class="sub" id="buyukAlt"></div>
-      <div class="badge" id="uyari" hidden></div>
-    </div>
-
-    <aside class="card">
-      <h2>Hesap dökümü</h2>
+      <div class="note" id="uyari" hidden></div>
+      <h2 class="rows-title">Hesap dökümü</h2>
       <div id="satirlar"></div>
       <button class="copy" id="paylas" type="button">Bağlantıyı kopyala</button>
-    </aside>
-  </section>
+    </section>
+  </div>
 </main>
 
 <section class="how" id="aciklama">

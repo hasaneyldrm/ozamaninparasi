@@ -12,15 +12,15 @@ endeksiyle (TÜFE) bugüne taşınır → güncel kurla tekrar TL'ye döner.
 | Dosya | İşlev |
 |---|---|
 | `index.html` | Tüm arayüz ve hesap mantığı (bağımlılık yok) |
-| `data.js` | Aylık USD/TRY kuru + ABD TÜFE serisi (1997–bugün) |
+| `data.js` | Aylık USD/TRY kuru + ABD TÜFE serisi (1997–bugün) + güncel USD/EUR kurları |
 | `veri-guncelle.py` | Verileri kaynaklardan yeniden çekip `data.js`'i üretir |
 
 ## Veri kaynakları
 
 - **Kur:** ECB referans kurları (1999+, günlüklerin aylık ortalaması), TCMB (1997–1998)
 - **ABD TÜFE:** BLS `CUUR0000SA0` (mevsimsellikten arındırılmamış)
-- Sayfa açılışında güncel kuru `frankfurter.dev` üzerinden tazelemeye çalışır; başarısız
-  olursa `data.js` içindeki son ay ortalamasıyla devam eder.
+- Sayfa açılışında güncel USD/TRY ve EUR/TRY kurunu `frankfurter.dev` üzerinden tazelemeye
+  çalışır; başarısız olursa `data.js` içindeki son kapanış değerleriyle devam eder.
 
 ## Notlar
 

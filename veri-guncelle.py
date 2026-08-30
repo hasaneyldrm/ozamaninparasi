@@ -68,6 +68,13 @@ def tufe_al(son_yil):
     return seri
 
 
+def guncel_kurlar():
+    """Bugunku USD/TRY ve EUR/TRY (footer seridi ve son adim icin)."""
+    ham = json.loads(getir("https://api.frankfurter.dev/v1/latest?base=USD&symbols=TRY,EUR"))
+    usd_try = ham["rates"]["TRY"]
+    return {"tarih": ham["date"], "usd": round(usd_try, 4), "eur": round(usd_try / ham["rates"]["EUR"], 4)}
+
+
 def main():
     bugun = date.today()
     kur = eski_kurlari_al()
@@ -77,6 +84,7 @@ def main():
     payload = {
         "guncelleme": bugun.isoformat(),
         "kaynak": {"kur": "ECB (1999+) / TCMB (1997-1998)", "tufe": "ABD BLS — CUUR0000SA0"},
+        "guncel": guncel_kurlar(),
         "kur": dict(sorted(kur.items())),
         "tufe": dict(sorted(tufe.items())),
     }

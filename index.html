@@ -153,8 +153,22 @@
     letter-spacing: -0.04em; line-height: 1.05;
     font-variant-numeric: tabular-nums; word-break: break-word;
   }
-  .sub { font-size: 15px; color: var(--soft); }
-  .usd-val { color: var(--dolar); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .sub { font-size: 14.5px; color: var(--soft); }
+  .totals { display: flex; align-items: flex-end; gap: 22px; flex-wrap: wrap; }
+  .t-tl { min-width: 0; }
+  .t-usd {
+    min-width: 0; padding-left: 22px; border-left: 1px solid var(--hair);
+    padding-bottom: 3px;
+  }
+  .t-usd .t-val {
+    font-size: clamp(24px, 3.2vw, 32px); font-weight: 700; letter-spacing: -0.03em;
+    color: var(--dolar); font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  @media (max-width: 520px) {
+    .totals { gap: 14px; }
+    .t-usd { padding-left: 0; border-left: 0; padding-bottom: 0; }
+    .t-usd .t-val { font-size: 24px; }
+  }
   .note { margin-top: 14px; background: var(--wash); border-radius: 12px; padding: 10px 13px; font-size: 13.5px; color: var(--ink); }
   .note[hidden] { display: none; }
 
@@ -222,7 +236,18 @@
 
   /* ---- alt bilgi ---- */
   .foot { border-top: 1px solid var(--hair); padding: 20px 0 34px; }
-  .foot .shell { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--soft); }
+  .foot .shell { display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; font-size: 13px; color: var(--soft); }
+  .foot-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .rates { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .rate { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; color: var(--ink); }
+  .rate b { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .rb {
+    width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .rb.usd { background: var(--dolar-wash); color: var(--dolar); }
+  .rb.eur { background: #eaf0fb; color: #1f5fbf; }
+  .rate-day { font-size: 12px; color: var(--ink-dim, var(--soft)); }
   .foot-link { border: 0; background: none; padding: 0; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 
   /* ---- modal ---- */
@@ -344,8 +369,16 @@
 
     <section class="card result" id="sonuc" aria-live="polite">
       <div class="lead" id="lead"></div>
-      <div class="big" id="buyuk">—</div>
-      <div class="sub" id="buyukAlt"></div>
+      <div class="totals">
+        <div class="t-tl">
+          <div class="big" id="buyuk">—</div>
+          <div class="sub" id="buyukAlt"></div>
+        </div>
+        <div class="t-usd" id="usdKutu">
+          <div class="t-val" id="buyukUsd"></div>
+          <div class="sub">bugünün dolarıyla</div>
+        </div>
+      </div>
       <div class="note" id="uyari" hidden></div>
       <div class="flow" id="akis"></div>
 
@@ -360,8 +393,15 @@
 
 <footer class="foot">
   <div class="shell">
-    <span>Sonuçlar yaklaşıktır. Veri: <span id="guncelleme"></span></span>
-    <button class="foot-link" type="button" data-ac>Nasıl hesaplanıyor?</button>
+    <div class="rates" id="kurlar">
+      <span class="rate"><span class="rb usd">$</span><span><b id="kurUsd">—</b> ₺</span></span>
+      <span class="rate"><span class="rb eur">€</span><span><b id="kurEur">—</b> ₺</span></span>
+      <span class="rate-day" id="kurTarih"></span>
+    </div>
+    <div class="foot-right">
+      <span>Sonuçlar yaklaşıktır. Veri: <span id="guncelleme"></span></span>
+      <button class="foot-link" type="button" data-ac>Nasıl hesaplanıyor?</button>
+    </div>
   </div>
 </footer>
 
@@ -408,7 +448,10 @@
 
   var tufeAnahtarlari = Object.keys(TUFE).sort();
   var SON_TUFE = tufeAnahtarlari[tufeAnahtarlari.length - 1];
-  var GUNCEL_KUR = KUR[SON_ANAHTAR];
+  var guncelVeri = window.VERI.guncel || {};
+  var GUNCEL_KUR = guncelVeri.usd || KUR[SON_ANAHTAR];
+  var GUNCEL_EUR = guncelVeri.eur || null;
+  var KUR_TARIH = guncelVeri.tarih || SON_ANAHTAR;
 
   var ORNEKLER = [
     { etiket: "1997'de 5 milyon lira", tutar: 5000000, yil: 1997, eski: true },
@@ -550,6 +593,7 @@
       $("buyuk").textContent = "—";
       $("buyukAlt").textContent = girilen ? "Bu dönem için veri yok." : "Bir tutar yaz.";
       $("satirlar").innerHTML = "";
+      $("buyukUsd").textContent = "";
       $("akis").innerHTML = "";
       $("uyari").hidden = true;
       return;
@@ -565,8 +609,8 @@
 
     $("lead").innerHTML = "<b>" + donem + " " + girilenMetin + "</b> bugün";
     sayacYaz(tlNow, animasyonlu);
-    $("buyukAlt").innerHTML = '<b class="usd-val">' + usd(usdNow) + "</b> · " +
-      trPara.format(tlNow / tutarTL) + " katı";
+    $("buyukAlt").textContent = trPara.format(tlNow / tutarTL) + " katı";
+    $("buyukUsd").textContent = usd(usdNow);
 
     $("akis").innerHTML =
       dugum(0, "", rozet("tl", "₺", "#ff385c"), tl(tutarTL), donem.replace(/'(de|da|te|ta)$/, "")) +
@@ -622,11 +666,16 @@
     if (!window.fetch) return;
     var kontrol = window.AbortController ? new AbortController() : {};
     var zamanlayici = setTimeout(function () { if (kontrol.abort) kontrol.abort(); }, 4000);
-    fetch("https://api.frankfurter.dev/v1/latest?base=USD&symbols=TRY", { signal: kontrol.signal })
+    fetch("https://api.frankfurter.dev/v1/latest?base=USD&symbols=TRY,EUR", { signal: kontrol.signal })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (d) {
         clearTimeout(zamanlayici);
-        if (d && d.rates && d.rates.TRY && d.date >= SON_ANAHTAR) { GUNCEL_KUR = d.rates.TRY; hesapla(false); }
+        if (!d || !d.rates || !d.rates.TRY || d.date < KUR_TARIH) return;
+        GUNCEL_KUR = d.rates.TRY;
+        if (d.rates.EUR) GUNCEL_EUR = d.rates.TRY / d.rates.EUR;
+        KUR_TARIH = d.date;
+        kurSeridiYaz();
+        hesapla(false);
       })
       .catch(function () { clearTimeout(zamanlayici); });
   }
@@ -713,10 +762,18 @@
     }
   });
 
+  function kurSeridiYaz() {
+    $("kurUsd").textContent = trPara2.format(GUNCEL_KUR);
+    if (GUNCEL_EUR) $("kurEur").textContent = trPara2.format(GUNCEL_EUR);
+    else $("kurEur").closest(".rate").hidden = true;
+    $("kurTarih").textContent = KUR_TARIH.split("-").reverse().join(".") + " kapanışı";
+  }
+
   $("kurKaynak").textContent = window.VERI.kaynak.kur;
   $("tufeKaynak").textContent = window.VERI.kaynak.tufe;
   $("guncelleme").textContent = window.VERI.guncelleme.split("-").reverse().join(".");
 
+  kurSeridiYaz();
   hesapla(true);
   guncelKuruTazele();
 })();

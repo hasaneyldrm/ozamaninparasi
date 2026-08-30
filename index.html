@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>O Zamanın Parası — Bugün Ne Eder?</title>
+<meta name="description" content="Geçmiş bir yıldaki TL tutarının bugünkü karşılığını dolar kuru ve ABD enflasyonu üzerinden hesaplayın.">
+<meta name="theme-color" content="#0b1020">
+<meta property="og:title" content="O Zamanın Parası">
+<meta property="og:description" content="1997'den bugüne: o zamanki paran bugün ne eder?">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>₺</text></svg>">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --bg: #0b1020;
+    --bg-2: #121a33;
+    --card: #161f3d;
+    --line: #253258;
+    --ink: #eef2ff;
+    --ink-soft: #9fb0d9;
+    --ink-dim: #6f80a8;
+    --gold: #ffc44d;
+    --gold-soft: #ffe6ad;
+    --green: #58d6a0;
+    --red: #ff7b7b;
+    --radius: 18px;
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: 0 16px calc(48px + env(safe-area-inset-bottom));
+    background: radial-gradient(1200px 600px at 50% -10%, #1c2a55 0%, var(--bg) 55%) no-repeat, var(--bg);
+    min-height: 100vh;
+    color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  header { padding: 34px 0 22px; text-align: center; }
+  h1 {
+    margin: 0 0 6px;
+    font-size: clamp(24px, 6.5vw, 34px);
+    letter-spacing: -0.02em;
+    font-weight: 800;
+  }
+  h1 .accent { color: var(--gold); }
+  header p { margin: 0; color: var(--ink-soft); font-size: 14px; }
+
+  .card {
+    background: linear-gradient(180deg, var(--card), var(--bg-2));
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .35);
+  }
+  label { display: block; font-size: 13px; color: var(--ink-soft); margin: 0 0 7px; font-weight: 600; }
+  .opt { color: var(--ink-dim); font-weight: 500; }
+
+  .amount-field { position: relative; }
+  .amount-field .cur {
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    font-size: clamp(22px, 6vw, 26px); color: var(--gold); font-weight: 700; pointer-events: none;
+  }
+  input[type="text"], select {
+    width: 100%;
+    background: #0d1428;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    color: var(--ink);
+    font: inherit;
+    padding: 14px 14px;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  input[type="text"] {
+    padding: 16px 14px 16px 44px;
+    font-size: clamp(22px, 6vw, 26px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  input:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(255, 196, 77, .16); }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239fb0d9' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
+  }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  @media (max-width: 330px) { .row { grid-template-columns: 1fr; } }
+
+  .old-lira {
+    display: flex; align-items: flex-start; gap: 10px;
+    margin-top: 14px; padding: 12px 14px;
+    background: rgba(255, 196, 77, .07);
+    border: 1px solid rgba(255, 196, 77, .28);
+    border-radius: 14px;
+    font-size: 13px; color: var(--gold-soft); line-height: 1.45;
+    cursor: pointer;
+  }
+  .old-lira input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--gold); flex: none; }
+  .old-lira[hidden] { display: none; }
+
+  .result { margin-top: 18px; }
+  .result-head { text-align: center; padding: 6px 0 2px; }
+  .result-head .lead { font-size: 14px; color: var(--ink-soft); }
+  .result-head .lead b { color: var(--ink); }
+  .big {
+    margin: 10px 0 2px;
+    font-size: clamp(38px, 13vw, 66px);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.03;
+    color: var(--gold);
+    font-variant-numeric: tabular-nums;
+    word-break: break-word;
+  }
+  .big-sub { font-size: 13px; color: var(--ink-dim); }
+
+  .steps { margin-top: 18px; display: grid; gap: 10px; }
+  .step {
+    display: grid; grid-template-columns: 26px 1fr; gap: 12px; align-items: start;
+    padding: 13px 14px;
+    background: #0f172f;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+  .step .n {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(255, 196, 77, .14); color: var(--gold);
+    font-size: 13px; font-weight: 700;
+    display: grid; place-items: center;
+  }
+  .step .t { font-size: 14px; color: var(--ink-soft); }
+  .step .t strong { color: var(--ink); font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .step .t .muted { display: block; margin-top: 2px; font-size: 12.5px; color: var(--ink-dim); }
+
+  .stats { margin-top: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media (max-width: 520px) {
+    .stats { grid-template-columns: 1fr; gap: 8px; }
+    .stat { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 10px 14px; }
+    .stat .v { font-size: 16px; margin-top: 0; }
+  }
+  .stat { padding: 12px 14px; background: #0f172f; border: 1px solid var(--line); border-radius: 14px; }
+  .stat .k { font-size: 12px; color: var(--ink-dim); }
+  .stat .v { font-size: 18px; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .stat .v.up { color: var(--green); }
+  .stat .v.down { color: var(--red); }
+
+  .warn {
+    margin-top: 14px; padding: 12px 14px; border-radius: 14px;
+    background: rgba(255, 123, 123, .1); border: 1px solid rgba(255, 123, 123, .3);
+    color: #ffc9c9; font-size: 13px;
+  }
+  .warn[hidden] { display: none; }
+
+  .share {
+    margin-top: 14px; width: 100%;
+    padding: 13px; border-radius: 14px; cursor: pointer;
+    background: transparent; border: 1px solid var(--line);
+    color: var(--ink-soft); font: inherit; font-weight: 600;
+  }
+  .share:active { background: #0f172f; }
+
+  footer { margin-top: 26px; text-align: center; font-size: 12px; color: var(--ink-dim); line-height: 1.6; }
+  footer a { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>O zamanın <span class="accent">parası</span></h1>
+    <p>Eski bir tutarın bugünkü karşılığı — dolar kuru ve ABD enflasyonuyla</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="amount-field">
+        <label for="tutar">Tutar</label>
+        <span class="cur">₺</span>
+        <input id="tutar" type="text" inputmode="decimal" autocomplete="off" placeholder="50.000" value="50.000">
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="yil">Yıl</label>
+          <select id="yil"></select>
+        </div>
+        <div>
+          <label for="ay">Ay <span class="opt">— opsiyonel</span></label>
+          <select id="ay"></select>
+        </div>
+      </div>
+
+      <label class="old-lira" id="eskiKutu" hidden>
+        <input type="checkbox" id="eski" checked>
+        <span><b>Eski TL olarak gir.</b> 2005'te paradan 6 sıfır atıldı; o dönemde "50 milyon lira" derdik. İşaretliyken girdiğin tutar eski TL sayılır.</span>
+      </label>
+    </section>
+
+    <section class="result" id="sonuc" aria-live="polite">
+      <div class="result-head">
+        <div class="lead" id="lead"></div>
+        <div class="big" id="buyuk">—</div>
+        <div class="big-sub" id="buyukAlt"></div>
+      </div>
+
+      <div class="steps" id="adimlar"></div>
+      <div class="stats" id="istatistik"></div>
+      <div class="warn" id="uyari" hidden></div>
+      <button class="share" id="paylas" type="button">Bağlantıyı kopyala</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      Yöntem: tutar o dönemin ortalama dolar kuruyla dolara çevrilir, ABD tüketici fiyat endeksiyle (TÜFE) bugüne taşınır,
+      güncel kurla tekrar TL'ye döner.<br>
+      Kur: <span id="kurKaynak"></span> · ABD TÜFE: <span id="tufeKaynak"></span> · Veri: <span id="guncelleme"></span>
+    </p>
+    <p>Sonuçlar yaklaşıktır, yatırım tavsiyesi değildir.</p>
+  </footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var KUR = window.VERI.kur, TUFE = window.VERI.tufe;
+  var AYLAR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+  var anahtarlar = Object.keys(KUR).sort();
+  var ILK_YIL = +anahtarlar[0].slice(0, 4);
+  var SON_ANAHTAR = anahtarlar[anahtarlar.length - 1];
+  var SON_YIL = +SON_ANAHTAR.slice(0, 4);
+
+  var tufeAnahtarlari = Object.keys(TUFE).sort();
+  var SON_TUFE = tufeAnahtarlari[tufeAnahtarlari.length - 1];
+  var GUNCEL_KUR = KUR[SON_ANAHTAR];
+  var guncelKurEtiket = ayAdi(SON_ANAHTAR) + " ortalaması";
+
+  var sonHash = "";
+  var $ = function (id) { return document.getElementById(id); };
+  var tutarEl = $("tutar"), yilEl = $("yil"), ayEl = $("ay"), eskiEl = $("eski"), eskiKutu = $("eskiKutu");
+
+  var trPara = new Intl.NumberFormat("tr-TR", { maximumFractionDigits: 0 });
+  var trPara2 = new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  var trKur = new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+
+  function ayAdi(k) { return AYLAR[+k.slice(5, 7) - 1] + " " + k.slice(0, 4); }
+
+  function tl(n) { return (n >= 1000 ? trPara.format(n) : trPara2.format(n)) + " ₺"; }
+  function usd(n) { return "$" + (n >= 1000 ? trPara.format(n) : trPara2.format(n)); }
+
+  // Bir yil/ay icin deger: ay verilmisse o ay, verilmemisse yil ortalamasi
+  function seriDeger(seri, yil, ay) {
+    if (ay) {
+      var k = yil + "-" + (ay < 10 ? "0" + ay : "" + ay);
+      return seri[k] != null ? { deger: seri[k], etiket: ayAdi(k), tam: true } : null;
+    }
+    var toplam = 0, adet = 0;
+    for (var m = 1; m <= 12; m++) {
+      var kk = yil + "-" + (m < 10 ? "0" + m : "" + m);
+      if (seri[kk] != null) { toplam += seri[kk]; adet++; }
+    }
+    if (!adet) return null;
+    return { deger: toplam / adet, etiket: yil + " ortalaması", tam: adet === 12 };
+  }
+
+  function sayiOku(s) {
+    var rakamlar = (s || "").replace(/\D/g, "");
+    return rakamlar ? parseInt(rakamlar, 10) : 0;
+  }
+
+  function tutarBicimle() {
+    var uzunluk = tutarEl.value.length, pos = tutarEl.selectionStart;
+    var n = sayiOku(tutarEl.value);
+    var bicimli = n ? trPara.format(n) : "";
+    if (bicimli !== tutarEl.value) {
+      tutarEl.value = bicimli;
+      var fark = bicimli.length - uzunluk;
+      try { tutarEl.setSelectionRange(Math.max(0, pos + fark), Math.max(0, pos + fark)); } catch (e) {}
+    }
+  }
+
+  function yillariDoldur() {
+    var parcalar = "";
+    for (var y = SON_YIL; y >= ILK_YIL; y--) parcalar += '<option value="' + y + '">' + y + "</option>";
+    yilEl.innerHTML = parcalar;
+  }
+
+  function aylariDoldur() {
+    var yil = +yilEl.value, secili = ayEl.value;
+    var parcalar = '<option value="">Tüm yıl</option>';
+    for (var m = 1; m <= 12; m++) {
+      var k = yil + "-" + (m < 10 ? "0" + m : "" + m);
+      if (KUR[k] != null) parcalar += '<option value="' + m + '">' + AYLAR[m - 1] + "</option>";
+    }
+    ayEl.innerHTML = parcalar;
+    ayEl.value = secili && ayEl.querySelector('option[value="' + secili + '"]') ? secili : "";
+  }
+
+  function adim(n, html) {
+    return '<div class="step"><div class="n">' + n + '</div><div class="t">' + html + "</div></div>";
+  }
+
+  function hesapla() {
+    var yil = +yilEl.value;
+    var ay = ayEl.value ? +ayEl.value : 0;
+    var eskiDonem = yil < 2005;
+
+    eskiKutu.hidden = !eskiDonem;
+    var eskiTL = eskiDonem && eskiEl.checked;
+
+    var girilen = sayiOku(tutarEl.value);
+    var tutarTL = eskiTL ? girilen / 1e6 : girilen;
+
+    var k = seriDeger(KUR, yil, ay);
+    var t = seriDeger(TUFE, yil, ay);
+    var tNow = TUFE[SON_TUFE];
+
+    if (!girilen || !k || !t) {
+      $("lead").textContent = "";
+      $("buyuk").textContent = "—";
+      $("buyukAlt").textContent = girilen ? "Bu dönem için veri yok." : "Bir tutar gir.";
+      $("adimlar").innerHTML = "";
+      $("istatistik").innerHTML = "";
+      $("uyari").hidden = true;
+      return;
+    }
+
+    var usdThen = tutarTL / k.deger;
+    var enflasyonKat = tNow / t.deger;
+    var usdNow = usdThen * enflasyonKat;
+    var tlNow = usdNow * GUNCEL_KUR;
+
+    var donem = ay ? AYLAR[ay - 1] + " " + yil : yil + "";
+    var girilenMetin = eskiTL
+      ? trPara.format(girilen) + " eski TL (" + tl(tutarTL) + ")"
+      : tl(tutarTL);
+
+    var donemEk = ay ? AYLAR[ay - 1] + " " + yil + "'de" : yilEki(yil);
+    $("lead").innerHTML = "<b>" + donemEk + "</b> <b>" + girilenMetin + "</b> bugün yaklaşık";
+    $("buyuk").textContent = tl(tlNow);
+    $("buyukAlt").textContent = "bugünün parasıyla · " + Math.round(tlNow / tutarTL) + " katı";
+
+    $("adimlar").innerHTML =
+      adim(1, "O dönemin kuruyla <strong>" + usd(usdThen) + "</strong> ediyordu." +
+              '<span class="muted">1 $ = ' + trKur.format(k.deger) + " ₺ · " + k.etiket + "</span>") +
+      adim(2, "Dolar enflasyonuyla bugün <strong>" + usd(usdNow) + "</strong> eder." +
+              '<span class="muted">ABD\'de fiyatlar o günden bugüne %' + trPara.format((enflasyonKat - 1) * 100) +
+              " arttı · TÜFE " + t.etiket + " → " + ayAdi(SON_TUFE) + "</span>") +
+      adim(3, "Güncel kurla <strong>" + tl(tlNow) + "</strong>." +
+              '<span class="muted">1 $ = ' + trKur.format(GUNCEL_KUR) + " ₺ · " + guncelKurEtiket + "</span>");
+
+    var kurArtis = GUNCEL_KUR / k.deger;
+    var alimGucu = tlNow / tutarTL;
+
+    $("istatistik").innerHTML =
+      '<div class="stat"><div class="k">ABD enflasyonu</div><div class="v up">%' + trPara.format((enflasyonKat - 1) * 100) + "</div></div>" +
+      '<div class="stat"><div class="k">Dolar kuru</div><div class="v down">' + trPara2.format(kurArtis) + " kat arttı</div></div>" +
+      '<div class="stat"><div class="k">Bugünkü karşılığı</div><div class="v">' + trPara2.format(alimGucu) + " kat</div></div>";
+
+    var uyarilar = [];
+    if (!k.tam && !ay) uyarilar.push(yil + " için yılın tamamı yerine mevcut ayların ortalaması kullanıldı.");
+    if (eskiDonem && !eskiTL) uyarilar.push("2005 öncesi tutarı yeni TL olarak hesaplıyoruz. O dönemin gazete fiyatlarını giriyorsan üstteki kutuyu işaretle.");
+    $("uyari").innerHTML = uyarilar.join("<br>");
+    $("uyari").hidden = uyarilar.length === 0;
+
+    sonHash = "#" + girilen + "-" + yil + (ay ? "-" + ay : "") + (eskiTL ? "-eski" : "");
+    if (location.hash !== sonHash) location.replace(sonHash);
+  }
+
+  // 2007'de, 1998'de, 2011'de ... Turkce yil eki
+  function yilEki(yil) {
+    var onluk = { 0: "'de", 10: "'da", 20: "'de", 30: "'da", 40: "'ta", 50: "'de", 60: "'ta", 70: "'te", 80: "'de", 90: "'da" };
+    var birlik = { 1: "'de", 2: "'de", 3: "'te", 4: "'te", 5: "'te", 6: "'da", 7: "'de", 8: "'de", 9: "'da" };
+    var son = yil % 10;
+    return yil + (son === 0 ? onluk[yil % 100] : birlik[son]);
+  }
+
+  function hashOku() {
+    var h = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!h) return false;
+    var p = h.split("-");
+    var tutar = parseFloat(p[0]), yil = parseInt(p[1], 10), ay = p[2] && p[2] !== "eski" ? parseInt(p[2], 10) : 0;
+    if (!tutar || !yil || yil < ILK_YIL || yil > SON_YIL) return false;
+    var eski = h.indexOf("eski") > -1;
+    yilEl.value = yil;
+    aylariDoldur();
+    if (ay) ayEl.value = ay;
+    eskiEl.checked = eski;
+    tutarEl.value = trPara.format(eski ? tutar : tutar);
+    return true;
+  }
+
+  // Guncel kuru canli cekmeyi dene; olmazsa gomulu veriyle devam et
+  function guncelKuruTazele() {
+    if (!window.fetch) return;
+    var kontrol = window.AbortController ? new AbortController() : {};
+    var zamanlayici = setTimeout(function () { if (kontrol.abort) kontrol.abort(); }, 4000);
+    fetch("https://api.frankfurter.dev/v1/latest?base=USD&symbols=TRY", { signal: kontrol.signal })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        clearTimeout(zamanlayici);
+        if (d && d.rates && d.rates.TRY && d.date >= SON_ANAHTAR) {
+          GUNCEL_KUR = d.rates.TRY;
+          guncelKurEtiket = d.date.split("-").reverse().join(".") + " kuru";
+          hesapla();
+        }
+      })
+      .catch(function () { clearTimeout(zamanlayici); });
+  }
+
+  yillariDoldur();
+  yilEl.value = Math.min(2007, SON_YIL);
+  aylariDoldur();
+  hashOku();
+
+  tutarEl.addEventListener("input", function () { tutarBicimle(); hesapla(); });
+  tutarEl.addEventListener("focus", function () { tutarEl.select(); });
+  yilEl.addEventListener("change", function () { aylariDoldur(); hesapla(); });
+  ayEl.addEventListener("change", hesapla);
+  eskiEl.addEventListener("change", hesapla);
+  window.addEventListener("hashchange", function () {
+    if (location.hash === sonHash) return;
+    if (hashOku()) hesapla();
+  });
+
+  $("paylas").addEventListener("click", function () {
+    var url = location.href;
+    var bitti = function () {
+      var b = $("paylas"), eski = b.textContent;
+      b.textContent = "Kopyalandı ✓";
+      setTimeout(function () { b.textContent = eski; }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(bitti, function () {});
+    } else if (navigator.share) {
+      navigator.share({ url: url });
+    }
+  });
+
+  $("kurKaynak").textContent = window.VERI.kaynak.kur;
+  $("tufeKaynak").textContent = window.VERI.kaynak.tufe;
+  $("guncelleme").textContent = window.VERI.guncelleme;
+
+  hesapla();
+  guncelKuruTazele();
+})();
+</script>
+</body>
+</html>

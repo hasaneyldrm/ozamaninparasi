@@ -70,7 +70,6 @@
     box-shadow: var(--shadow-lg); padding: 18px; max-width: 560px;
     display: grid; gap: 12px;
   }
-  .box > * { min-width: 0; }
   .field label { display: block; font-size: 12px; font-weight: 700; letter-spacing: .01em; color: var(--soft); margin-bottom: 5px; text-transform: uppercase; }
   .field label .opt { text-transform: none; letter-spacing: 0; font-weight: 400; }
   .amount-in {
@@ -81,7 +80,7 @@
   .amount-in:focus-within { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
   .amount-in .sym { font-size: 26px; font-weight: 600; color: var(--soft); line-height: 1; }
   .amount-in input {
-    flex: 1 1 auto; width: 100%; min-width: 0; border: 0; background: none; padding: 0; outline: none;
+    flex: 1; min-width: 0; border: 0; background: none; padding: 0; outline: none;
     font: inherit; font-size: 28px; font-weight: 700; letter-spacing: -0.02em;
     color: var(--ink); font-variant-numeric: tabular-nums;
   }
@@ -210,7 +209,7 @@
       <label for="tutar">O zamanki tutar</label>
       <div class="amount-in">
         <span class="sym">₺</span>
-        <input id="tutar" type="text" size="1" inputmode="numeric" autocomplete="off" placeholder="50.000" value="50.000">
+        <input id="tutar" type="text" inputmode="numeric" autocomplete="off" placeholder="50.000" value="50.000">
       </div>
     </div>
 
@@ -510,6 +509,24 @@
   hesapla();
   guncelKuruTazele();
 })();
+</script>
+
+<script>
+setTimeout(function () {
+  var vw = document.documentElement.clientWidth, cikti = [];
+  var hepsi = document.querySelectorAll("body *");
+  for (var i = 0; i < hepsi.length; i++) {
+    var el = hepsi[i], r = el.getBoundingClientRect();
+    if (r.right > vw + 1) {
+      var ad = el.tagName + "." + (typeof el.className === "string" ? el.className : "svg");
+      cikti.push(ad + "[right=" + Math.round(r.right) + ",w=" + Math.round(r.width) + "]");
+    }
+  }
+  var d = document.createElement("div");
+  d.id = "OLCUM";
+  d.textContent = "###VW=" + vw + " SW=" + document.documentElement.scrollWidth + " TASANLAR: " + cikti.join(" ") + "###";
+  document.body.appendChild(d);
+}, 600);
 </script>
 </body>
 </html>

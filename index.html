@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>O Zamanın Parası — Bugün Ne Eder?</title>
-<meta name="description" content="Geçmiş bir yıldaki TL tutarının bugünkü karşılığını dolar kuru ve ABD enflasyonu üzerinden hesaplayın.">
+<meta name="description" content="Geçmiş bir yıldaki TL tutarının bugünkü karşılığını, ya da bugünkü bir tutarın o yıldaki karşılığını dolar kuru ve ABD enflasyonu üzerinden hesaplayın.">
 <meta name="theme-color" content="#ffffff">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.frankfurter.dev; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta property="og:title" content="O Zamanın Parası">
-<meta property="og:description" content="1997'den bugüne: o zamanki paran bugün ne eder?">
+<meta property="og:description" content="1997'den bugüne, bugünden 1997'ye: o zamanki paran bugün ne eder, bugünkü paran o zaman ne ederdi?">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><circle cx='20' cy='20' r='10.5' fill='%23FFF1F3'/><path d='M9.2 13.4A14 14 0 1 1 6.4 22.6' fill='none' stroke='%23FF385C' stroke-width='3.4' stroke-linecap='round'/><path d='M3.6 7.6v6.6h6.6' fill='none' stroke='%23FF385C' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/><text x='20' y='26.5' text-anchor='middle' font-size='17' font-weight='700' fill='%23222222'>&#8378;</text></svg>">
 <style>
   *, *::before, *::after { box-sizing: border-box; }
@@ -134,6 +134,32 @@
   }
   .go:hover { filter: brightness(1.06); }
   .go:active { transform: scale(.995); }
+
+  /* ---- yon anahtari ---- */
+  .yon {
+    display: inline-flex; gap: 4px; padding: 4px; margin: 0 0 18px;
+    background: var(--wash); border-radius: 999px; max-width: 100%;
+  }
+  .yon button {
+    border: 0; background: none; border-radius: 999px; cursor: pointer;
+    padding: 9px 16px; font: inherit; font-size: 14px; font-weight: 600; color: var(--soft);
+    white-space: nowrap; transition: color .15s ease, background .15s ease, box-shadow .15s ease;
+  }
+  .yon button:hover { color: var(--ink); }
+  .yon button[aria-pressed="true"] {
+    background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, .14);
+  }
+  @media (max-width: 560px) {
+    .yon { display: flex; width: 100%; }
+    .yon button { flex: 1 1 0; padding: 9px 6px; font-size: 13px; }
+  }
+  .oldnote {
+    background: var(--wash); border-radius: 12px; padding: 11px 13px;
+    font-size: 13px; line-height: 1.45; color: var(--soft);
+  }
+  .oldnote[hidden] { display: none; }
+  .tag.old { background: #f4f0e8; color: #6b5a3e; }
+  .tag.old b { color: #4a3c26; }
 
   /* ---- ornek cipleri ---- */
   .examples { display: flex; align-items: center; gap: 14px; margin: 2px 0 22px; }
@@ -365,8 +391,13 @@
 
 <main class="shell">
   <div class="hero">
-    <h1>O zamanki paran bugün ne eder?</h1>
-    <p>Tutarı yaz, yılı seç. Dolar kuru ve ABD enflasyonuyla bugüne taşıyalım.</p>
+    <h1 id="baslik">O zamanki paran bugün ne eder?</h1>
+    <p id="altBaslik">Tutarı yaz, yılı seç. Dolar kuru ve ABD enflasyonuyla bugüne taşıyalım.</p>
+  </div>
+
+  <div class="yon" role="group" aria-label="Hesap yönü">
+    <button type="button" id="yonIleri" aria-pressed="true">O zamandan bugüne</button>
+    <button type="button" id="yonGeri" aria-pressed="false">Bugünden o zamana</button>
   </div>
 
   <div class="examples" aria-label="Örnekler">
@@ -378,7 +409,7 @@
     <div class="col">
       <form class="box" onsubmit="return false">
       <div class="field amount">
-        <label for="tutar">O zamanki tutar</label>
+        <label for="tutar" id="tutarEtiket">O zamanki tutar</label>
         <div class="amount-in">
           <span class="sym">₺</span>
           <input id="tutar" type="text" size="1" inputmode="numeric" autocomplete="off" placeholder="50.000" value="50.000">
@@ -387,7 +418,7 @@
 
       <div class="when">
         <div class="field">
-          <label for="yil">Hangi yıl?</label>
+          <label for="yil" id="yilEtiket">Hangi yıl?</label>
           <select id="yil"></select>
         </div>
         <div class="field">
@@ -402,6 +433,8 @@
           <span class="oldcheck-eq" id="tutarNot"></span></span>
       </label>
 
+      <div class="oldnote" id="eskiNot" hidden></div>
+
       <div class="fix" id="tutarUyari" hidden>
         <span id="fixMetin"></span>
         <button type="button" class="fix-btn" id="fixDugme"></button>
@@ -410,7 +443,7 @@
       <button class="go" id="git" type="button">Bugün ne eder?</button>
     </form>
 
-      <p class="tip">Ay seçmezsen o yılın 12 aylık ortalama kuru kullanılır.
+      <p class="tip" id="ipucu">Ay seçmezsen o yılın 12 aylık ortalama kuru kullanılır.
         2005 öncesi bir yıl seçtiğinde "eski TL" kutusu çıkar.</p>
     </div>
 
@@ -465,6 +498,10 @@
       <p class="modal-note">Neden dolar? Türkiye'nin uzun dönemli resmî enflasyon serisi yerine
         kur + ABD enflasyonu kullanmak, "o gün bu parayla kaç dolar alırdım, o dolar bugün ne eder"
         sorusunun daha sezgisel bir cevabını veriyor.</p>
+      <p class="modal-note"><b>Ters yön.</b> "Bugünden o zamana" seçtiğinde aynı üç adım tersten
+        işletilir: bugünkü tutar bugünkü kurla dolara çevrilir, ABD enflasyonu geri alınarak o günün
+        dolarına inilir, sonra o günün kuruyla o günün parasına dönülür. 2005 öncesi yıllarda sonuç
+        eski lira cinsinden gösterilir.</p>
       <p class="modal-note">2005'te paradan 6 sıfır atıldı; 2005 öncesi yıllarda formda çıkan
         "eski TL" kutusu, girdiğin tutarı 1.000.000'e bölüyor.</p>
       <p class="modal-note">Site çerez kullanmaz, reklam ve izleme betiği içermez. Sayfa altındaki ziyaret
@@ -502,6 +539,38 @@
     { etiket: "2020'de 250.000 ₺", tutar: 250000, yil: 2020 }
   ];
 
+  var ORNEKLER_GERI = [
+    { etiket: "Bugünkü 100.000 ₺ · 1997", tutar: 100000, yil: 1997 },
+    { etiket: "Bugünkü 250.000 ₺ · 2003", tutar: 250000, yil: 2003 },
+    { etiket: "Bugünkü 1.000.000 ₺ · 2010", tutar: 1000000, yil: 2010 },
+    { etiket: "Bugünkü 500.000 ₺ · 2015", tutar: 500000, yil: 2015 },
+    { etiket: "Bugünkü 50.000 ₺ · 2020", tutar: 50000, yil: 2020 }
+  ];
+
+  // Yon: false = o zamandan bugune, true = bugunden o zamana
+  var geriMi = false;
+
+  var METIN = {
+    ileri: {
+      h1: "O zamanki paran bugün ne eder?",
+      alt: "Tutarı yaz, yılı seç. Dolar kuru ve ABD enflasyonuyla bugüne taşıyalım.",
+      tutar: "O zamanki tutar",
+      yil: "Hangi yıl?",
+      buton: "Bugün ne eder?",
+      ipucu: "Ay seçmezsen o yılın 12 aylık ortalama kuru kullanılır. " +
+        "2005 öncesi bir yıl seçtiğinde \"eski TL\" kutusu çıkar."
+    },
+    geri: {
+      h1: "Bugünkü paran o zaman ne ederdi?",
+      alt: "Tutarı yaz, gitmek istediğin yılı seç. Bugünün parasını o günün parasına çevirelim.",
+      tutar: "Bugünkü tutar",
+      yil: "Hangi yıla gidelim?",
+      buton: "O zaman ne ederdi?",
+      ipucu: "Ay seçmezsen o yılın 12 aylık ortalama kuru kullanılır. " +
+        "2005 öncesi bir yıl seçtiğinde sonuç o günün lirasıyla gösterilir."
+    }
+  };
+
   var sonHash = "";
   var $ = function (id) { return document.getElementById(id); };
   var tutarEl = $("tutar"), yilEl = $("yil"), ayEl = $("ay"), eskiEl = $("eski"), eskiKutu = $("eskiKutu");
@@ -509,11 +578,19 @@
   var trPara = new Intl.NumberFormat("tr-TR", { maximumFractionDigits: 0 });
   var trPara2 = new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   var trKur = new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+  var trOndalik1 = new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
   function ayAdi(k) { return AYLAR[+k.slice(5, 7) - 1] + " " + k.slice(0, 4); }
   function tl(n) { return (n >= 1000 ? trPara.format(n) : trPara2.format(n)) + " ₺"; }
   function usd(n) { return "$" + (n >= 1000 ? trPara.format(n) : trPara2.format(n)); }
   function kurYaz(n) { return (n >= 10 ? trPara2.format(n) : trKur.format(n)) + " ₺"; }
+  function eskiLira(n) { return trPara.format(n * 1e6) + " lira"; }
+  // %100 yazmamak icin asagi yuvarlar: 99,98 / 99,8 / 87
+  function yuzdeYaz(p) {
+    if (p >= 99.9) return trPara2.format(Math.floor(p * 100) / 100);
+    if (p >= 95) return trOndalik1.format(Math.floor(p * 10) / 10);
+    return trPara.format(p);
+  }
 
 
   // 2007'de, 2013'te, 2020'de ... Turkce yil eki
@@ -585,7 +662,12 @@
       sembol + "</text></svg>";
   }
 
-  function trendSvg() {
+  function trendSvg(asagi) {
+    if (asagi) {
+      return '<svg width="30" height="18" viewBox="0 0 30 18" fill="none" aria-hidden="true">' +
+        '<path d="M2 2.5l7.5 7 5-4L26 15" stroke="#9c3350" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M19.5 15H27V7.5" stroke="#9c3350" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    }
     return '<svg width="30" height="18" viewBox="0 0 30 18" fill="none" aria-hidden="true">' +
       '<path d="M2 15.5l7.5-7 5 4L26 3" stroke="#0e8a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
       '<path d="M19.5 3H27v7.5" stroke="#0e8a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -598,20 +680,21 @@
       '<span class="c">' + etiket + "</span></span>";
   }
 
-  function miniOk(etiket, trend) {
+  function miniOk(etiket, trend, asagi) {
     var ikon = trend
-      ? trendSvg()
+      ? trendSvg(asagi)
       : '<svg width="18" height="8" viewBox="0 0 20 8" fill="none" aria-hidden="true">' +
         '<path d="M0 4h17M14 1l3 3-3 3" stroke="#c3c3c3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     return '<span class="ar' + (trend ? " trend" : "") + '"><span class="ik">' + ikon + "</span>" +
       '<span class="op">' + etiket + "</span></span>";
   }
 
-  function sayacYaz(hedef, animasyonlu) {
+  function sayacYaz(hedef, animasyonlu, birim) {
+    var br = birim || "TL";
     var el = $("buyuk");
     var bicim = hedef >= 1000
-      ? function (n) { return trPara.format(n) + ' <span class="cur">TL</span>'; }
-      : function (n) { return trPara2.format(n) + ' <span class="cur">TL</span>'; };
+      ? function (n) { return trPara.format(n) + ' <span class="cur">' + br + '</span>'; }
+      : function (n) { return trPara2.format(n) + ' <span class="cur">' + br + '</span>'; };
     if (sayacId) { cancelAnimationFrame(sayacId); sayacId = null; }
     if (!animasyonlu || azHareket) { el.innerHTML = bicim(hedef); return; }
     var bas = null, sure = 620;
@@ -637,6 +720,22 @@
     if (!d) {
       parcalar = fxOge("usd", "$", "—", "1 dolar = " + trPara2.format(GUNCEL_KUR) + " ₺", "");
       if (GUNCEL_EUR) parcalar += fxOge("eur", "€", "—", "1 euro = " + trPara2.format(GUNCEL_EUR) + " ₺", "");
+    } else if (d.geri) {
+      // Bugunden o zamana: enflasyon geri alinir, o gunun kuruyla o gunun parasina cevrilir
+      var geriYuzde = trPara.format((d.enflasyonKat - 1) * 100);
+      var oGunKur = d.eskiDonem ? eskiLira(d.kur) : kurYaz(d.kur);
+      var geriBalon =
+        '<div class="baslik">Dolar hesabı</div>' +
+        '<div class="mini">' +
+        miniAdim(tl(d.tutarTL), "tl", "bugün") +
+        miniOk("kur " + trPara2.format(GUNCEL_KUR)) +
+        miniAdim(usd(d.usdNow), "usd", "bugünkü dolar") +
+        miniOk("÷ " + trPara2.format(d.enflasyonKat), true, true) +
+        miniAdim(usd(d.usdThen), "usd son", d.donem + " doları") +
+        "</div>" +
+        '<p class="aciklama">ABD\'de fiyatlar o günden bugüne %' + geriYuzde +
+        " arttı; burada bu artış geri alınıyor.</p>";
+      parcalar = fxOge("usd", "$", usd(d.usdThen), "o gün 1 dolar = " + oGunKur, geriBalon);
     } else {
       var enfYuzde = trPara.format((d.enflasyonKat - 1) * 100);
       var dolarBalon =
@@ -681,8 +780,13 @@
     var ay = ayEl.value ? +ayEl.value : 0;
     var eskiDonem = yil < 2005;
 
-    eskiKutu.hidden = !eskiDonem;
-    var eskiTL = eskiDonem && eskiEl.checked;
+    eskiKutu.hidden = !eskiDonem || geriMi;
+    $("eskiNot").hidden = !(eskiDonem && geriMi);
+    if (eskiDonem && geriMi) {
+      $("eskiNot").innerHTML = "<b>" + yil + "</b>'de para 6 sıfırlıydı — " +
+        "sonucu o günün lirasıyla gösteriyoruz.";
+    }
+    var eskiTL = !geriMi && eskiDonem && eskiEl.checked;
 
     var girilen = sayiOku(tutarEl.value);
     var tutarTL = eskiTL ? girilen / 1e6 : girilen;
@@ -703,67 +807,109 @@
       return;
     }
 
-    var usdThen = tutarTL / k.deger;
     var enflasyonKat = tNow / t.deger;
-    var usdNow = usdThen * enflasyonKat;
-    var tlNow = usdNow * GUNCEL_KUR;
-
-    var donem = ay ? AYLAR[ay - 1] + " " + yil + "'de" : yilEki(yil);
-    var girilenMetin = eskiTL ? trPara.format(girilen) + " eski TL" : tl(tutarTL);
-
-    $("lead").innerHTML = "<b>" + donem + " " + girilenMetin + "</b> bugün";
-    sayacYaz(tlNow, animasyonlu);
-    $("buyukAlt").innerHTML =
-      '<span class="tag kat"><b>' + trPara.format(tlNow / tutarTL) + "×</b> katına çıktı</span>";
-
-    kurSeridiYaz({
-      donem: donem.replace(/'(de|da|te|ta)$/, ""), donemEkli: donem,
-      tutarTL: tutarTL, kur: k.deger, usdThen: usdThen,
-      enflasyonKat: enflasyonKat, usdNow: usdNow, tlNow: tlNow
-    });
-
+    var donem = (ay ? AYLAR[ay - 1] + " " : "") + yilEki(yil);
+    var donemDuz = donem.replace(/'(de|da|te|ta)$/, "");
     var kart = $("sonuc");
-    if (animasyonlu && !azHareket) {
-      kart.classList.remove("anim");
-      void kart.offsetWidth;
-      kart.classList.add("anim");
+
+    if (geriMi) {
+      // Bugunden o zamana: bugunku TL -> bugunku dolar -> enflasyon geri -> o gunku dolar -> o gunku TL
+      var gUsdNow = tutarTL / GUNCEL_KUR;
+      var gUsdThen = gUsdNow / enflasyonKat;
+      var tlThen = gUsdThen * k.deger;
+      var gosterilen = eskiDonem ? tlThen * 1e6 : tlThen;
+      var birim = eskiDonem ? "lira" : "TL";
+
+      $("lead").innerHTML = "<b>Bugünkü " + tl(tutarTL) + "</b> " + donem;
+      sayacYaz(gosterilen, animasyonlu, birim);
+
+      var kayip = (1 - tlThen / tutarTL) * 100;
+      var altlar = '<span class="tag kat"><b>%' + yuzdeYaz(kayip) + "</b> değer kaybı</span>";
+      if (eskiDonem) altlar += '<span class="tag old">yeni parayla <b>' + tl(tlThen) + "</b></span>";
+      $("buyukAlt").innerHTML = altlar;
+
+      kurSeridiYaz({
+        geri: true, eskiDonem: eskiDonem, donem: donemDuz,
+        tutarTL: tutarTL, kur: k.deger, enflasyonKat: enflasyonKat,
+        usdNow: gUsdNow, usdThen: gUsdThen
+      });
+
+      if (animasyonlu && !azHareket) {
+        kart.classList.remove("anim");
+        void kart.offsetWidth;
+        kart.classList.add("anim");
+      }
+
+      $("satirlar").innerHTML =
+        line("Bugünkü tutar", tl(tutarTL)) +
+        line("Bugünkü kur (1 $)", kurYaz(GUNCEL_KUR)) +
+        line("Dolar karşılığı", usd(gUsdNow)) +
+        line("ABD enflasyonu geri alındı (%" + trPara.format((enflasyonKat - 1) * 100) + ")", usd(gUsdThen)) +
+        line(donemDuz + " kuru (1 $)", eskiDonem ? eskiLira(k.deger) : kurYaz(k.deger)) +
+        (eskiDonem ? line("Bugünkü TL cinsinden", tl(tlThen)) : "") +
+        line(donemDuz + " karşılığı", eskiDonem ? eskiLira(tlThen) : tl(tlThen), " total");
+
+      $("tutarNot").textContent = "";
+      $("tutarUyari").hidden = true;
+    } else {
+      var usdThen = tutarTL / k.deger;
+      var usdNow = usdThen * enflasyonKat;
+      var tlNow = usdNow * GUNCEL_KUR;
+      var girilenMetin = eskiTL ? trPara.format(girilen) + " eski TL" : tl(tutarTL);
+
+      $("lead").innerHTML = "<b>" + donem + " " + girilenMetin + "</b> bugün";
+      sayacYaz(tlNow, animasyonlu);
+      $("buyukAlt").innerHTML =
+        '<span class="tag kat"><b>' + trPara.format(tlNow / tutarTL) + "×</b> katına çıktı</span>";
+
+      kurSeridiYaz({
+        donem: donemDuz, donemEkli: donem,
+        tutarTL: tutarTL, kur: k.deger, usdThen: usdThen,
+        enflasyonKat: enflasyonKat, usdNow: usdNow, tlNow: tlNow
+      });
+
+      if (animasyonlu && !azHareket) {
+        kart.classList.remove("anim");
+        void kart.offsetWidth;
+        kart.classList.add("anim");
+      }
+
+      $("satirlar").innerHTML =
+        line(donemDuz + " tutarı", eskiTL ? trPara.format(girilen) + " eski TL" : tl(tutarTL)) +
+        (eskiTL ? line("Bugünkü TL cinsinden", tl(tutarTL)) : "") +
+        line("O günkü kur (1 $)", kurYaz(k.deger)) +
+        line("Dolar karşılığı", usd(usdThen)) +
+        line("ABD enflasyonu (%" + trPara.format((enflasyonKat - 1) * 100) + ")", usd(usdNow)) +
+        line("Bugünkü kur (1 $)", kurYaz(GUNCEL_KUR)) +
+        line("Bugünkü karşılığı", tl(tlNow), " total");
+
+      // Eski TL kutusunun ne yaptigini aninda goster
+      $("tutarNot").textContent = eskiTL
+        ? trPara.format(girilen) + " eski TL = " + tl(tutarTL) + " (bugünkü TL)"
+        : "";
+
+      // Tutar donem icin sasirtici derecede kucuk/buyukse tek tikla duzeltme oner
+      var uyariMetni = "", dugmeMetni = "";
+      if (eskiDonem && eskiTL && usdThen < 1) {
+        uyariMetni = "Bu tutar " + yil + " için çok küçük: o gün " + usd(usdThen) +
+          " ederdi. Bugünkü TL cinsinden mi yazdın?";
+        dugmeMetni = "Bugünkü TL say";
+      } else if (eskiDonem && !eskiTL && usdThen > 500000) {
+        uyariMetni = "Bu tutar " + yil + " için çok büyük: o gün " + usd(usdThen) +
+          " ederdi. Eski TL cinsinden mi yazdın?";
+        dugmeMetni = "Eski TL say";
+      }
+      $("fixMetin").textContent = uyariMetni;
+      $("fixDugme").textContent = dugmeMetni;
+      $("tutarUyari").hidden = !uyariMetni;
     }
-
-    $("satirlar").innerHTML =
-      line(donem.replace(/'(de|da|te|ta)$/, "") + " tutarı", eskiTL ? trPara.format(girilen) + " eski TL" : tl(tutarTL)) +
-      (eskiTL ? line("Bugünkü TL cinsinden", tl(tutarTL)) : "") +
-      line("O günkü kur (1 $)", kurYaz(k.deger)) +
-      line("Dolar karşılığı", usd(usdThen)) +
-      line("ABD enflasyonu (%" + trPara.format((enflasyonKat - 1) * 100) + ")", usd(usdNow)) +
-      line("Bugünkü kur (1 $)", kurYaz(GUNCEL_KUR)) +
-      line("Bugünkü karşılığı", tl(tlNow), " total");
-
-    // Eski TL kutusunun ne yaptigini aninda goster
-    $("tutarNot").textContent = eskiTL
-      ? trPara.format(girilen) + " eski TL = " + tl(tutarTL) + " (bugünkü TL)"
-      : "";
-
-    // Tutar donem icin sasirtici derecede kucuk/buyukse tek tikla duzeltme oner
-    var uyariMetni = "", dugmeMetni = "";
-    if (eskiDonem && eskiTL && usdThen < 1) {
-      uyariMetni = "Bu tutar " + yil + " için çok küçük: o gün " + usd(usdThen) +
-        " ederdi. Bugünkü TL cinsinden mi yazdın?";
-      dugmeMetni = "Bugünkü TL say";
-    } else if (eskiDonem && !eskiTL && usdThen > 500000) {
-      uyariMetni = "Bu tutar " + yil + " için çok büyük: o gün " + usd(usdThen) +
-        " ederdi. Eski TL cinsinden mi yazdın?";
-      dugmeMetni = "Eski TL say";
-    }
-    $("fixMetin").textContent = uyariMetni;
-    $("fixDugme").textContent = dugmeMetni;
-    $("tutarUyari").hidden = !uyariMetni;
 
     var uyarilar = [];
     if (!k.tam && !ay) uyarilar.push(yil + " için yılın mevcut aylarının ortalaması kullanıldı.");
     $("uyari").innerHTML = uyarilar.join("<br>");
     $("uyari").hidden = uyarilar.length === 0;
 
-    sonHash = "#" + girilen + "-" + yil + (ay ? "-" + ay : "") + (eskiTL ? "-eski" : "");
+    sonHash = "#" + girilen + "-" + yil + (ay ? "-" + ay : "") + (eskiTL ? "-eski" : "") + (geriMi ? "-geri" : "");
     if (location.hash !== sonHash) location.replace(sonHash);
   }
 
@@ -771,8 +917,11 @@
     var h = decodeURIComponent(location.hash.replace(/^#/, ""));
     if (!h) return false;
     var p = h.split("-");
-    var tutar = parseFloat(p[0]), yil = parseInt(p[1], 10), ay = p[2] && p[2] !== "eski" ? parseInt(p[2], 10) : 0;
+    var tutar = parseFloat(p[0]), yil = parseInt(p[1], 10);
+    var ay = p[2] && p[2] !== "eski" && p[2] !== "geri" ? parseInt(p[2], 10) : 0;
     if (!tutar || !yil || yil < ILK_YIL || yil > SON_YIL) return false;
+    geriMi = h.indexOf("geri") > -1;
+    yonUygula();
     yilEl.value = yil;
     aylariDoldur();
     if (ay) ayEl.value = ay;
@@ -800,7 +949,7 @@
   }
 
   yillariDoldur();
-  orneklerDoldur();
+  yonUygula();
   yilEl.value = Math.min(2007, SON_YIL);
   aylariDoldur();
   hashOku();
@@ -816,24 +965,50 @@
   });
 
   function orneklerDoldur() {
+    var liste = geriMi ? ORNEKLER_GERI : ORNEKLER;
     var kap = $("ornekler"), parcalar = "";
-    for (var i = 0; i < ORNEKLER.length; i++) {
-      if (ORNEKLER[i].yil < ILK_YIL || ORNEKLER[i].yil > SON_YIL) continue;
-      parcalar += '<button class="chip" type="button" data-i="' + i + '">' + ORNEKLER[i].etiket + "</button>";
+    for (var i = 0; i < liste.length; i++) {
+      if (liste[i].yil < ILK_YIL || liste[i].yil > SON_YIL) continue;
+      parcalar += '<button class="chip" type="button" data-i="' + i + '">' + liste[i].etiket + "</button>";
     }
     kap.innerHTML = parcalar;
-    kap.addEventListener("click", function (e) {
-      var dugme = e.target.closest ? e.target.closest(".chip") : null;
-      if (!dugme) return;
-      var o = ORNEKLER[+dugme.getAttribute("data-i")];
-      yilEl.value = o.yil;
-      aylariDoldur();
-      ayEl.value = "";
-      eskiEl.checked = !!o.eski;
-      tutarEl.value = trPara.format(o.tutar);
-      hesapla(true);
-    });
   }
+
+  $("ornekler").addEventListener("click", function (e) {
+    var dugme = e.target.closest ? e.target.closest(".chip") : null;
+    if (!dugme) return;
+    var o = (geriMi ? ORNEKLER_GERI : ORNEKLER)[+dugme.getAttribute("data-i")];
+    yilEl.value = o.yil;
+    aylariDoldur();
+    ayEl.value = "";
+    eskiEl.checked = !!o.eski;
+    tutarEl.value = trPara.format(o.tutar);
+    hesapla(true);
+  });
+
+  // Yon anahtari: baslik, etiketler, buton ve ornekler yone gore degisir
+  function yonUygula() {
+    var m = geriMi ? METIN.geri : METIN.ileri;
+    $("baslik").textContent = m.h1;
+    $("altBaslik").textContent = m.alt;
+    $("tutarEtiket").textContent = m.tutar;
+    $("yilEtiket").textContent = m.yil;
+    $("git").textContent = m.buton;
+    $("ipucu").textContent = m.ipucu;
+    $("yonIleri").setAttribute("aria-pressed", geriMi ? "false" : "true");
+    $("yonGeri").setAttribute("aria-pressed", geriMi ? "true" : "false");
+    orneklerDoldur();
+  }
+
+  function yonSec(geri) {
+    if (geriMi === geri) return;
+    geriMi = geri;
+    yonUygula();
+    hesapla(true);
+  }
+
+  $("yonIleri").addEventListener("click", function () { yonSec(false); });
+  $("yonGeri").addEventListener("click", function () { yonSec(true); });
 
   $("fixDugme").addEventListener("click", function () {
     eskiEl.checked = !eskiEl.checked;

@@ -881,12 +881,27 @@
     }
   });
 
+  // Ziyaret sayacı (kendi Worker'ımız, aynı alan adı üzerinden)
+  function sayaciGetir() {
+    if (!window.fetch) return;
+    fetch("/api/sayac", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || typeof d.toplam !== "number" || d.toplam < 1) return;
+        var el = $("sayac");
+        el.innerHTML = "<b>" + trPara.format(d.toplam) + "</b> kez görüntülendi";
+        el.hidden = false;
+      })
+      .catch(function () {});
+  }
+
   $("kurKaynak").textContent = window.VERI.kaynak.kur;
   $("tufeKaynak").textContent = window.VERI.kaynak.tufe;
   $("guncelleme").textContent = window.VERI.guncelleme.split("-").reverse().join(".");
 
   hesapla(true);
   guncelKuruTazele();
+  sayaciGetir();
 })();
 </script>
 </body>

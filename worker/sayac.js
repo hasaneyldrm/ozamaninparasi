@@ -53,6 +53,12 @@ export default {
       return new Response(JSON.stringify({ hata: "yalnız GET" }), { status: 405, headers: basliklar });
     }
 
+    // Sayaç yalnız kendi sayfamızdan çağrılabilsin (curl ile şişirmeyi zorlaştırır)
+    const kaynak = request.headers.get("origin") || request.headers.get("referer") || "";
+    if (kaynak && !kaynak.startsWith("https://ozamaninparasiyla.com")) {
+      return new Response(JSON.stringify({ hata: "yetkisiz kaynak" }), { status: 403, headers: basliklar });
+    }
+
     const ip = request.headers.get("cf-connecting-ip") || "";
     const ua = request.headers.get("user-agent") || "";
     const parmak = await hash(ip + "|" + ua);

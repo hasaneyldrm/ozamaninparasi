@@ -1,0 +1,8 @@
+# yerel gizli dosyalar
+*.token
+.env
+.env.*
+.cf_token
+# geçici
+.DS_Store
+*.tmp

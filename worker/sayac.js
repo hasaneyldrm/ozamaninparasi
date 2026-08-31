@@ -4,6 +4,10 @@
 // plandaki 1.000 yazma/gün limiti dolmasın diye biriktirilerek).
 
 const ANAHTAR = "toplam";
+const IZINLI_KAYNAKLAR = [
+  "https://ozamaninparasiyla.com",
+  "https://www.ozamaninparasiyla.com",
+];
 const YAZMA_ESIGI = 20;        // bu kadar yeni ziyarette bir KV'ye yaz
 const YAZMA_ARALIGI = 300000;  // ya da 5 dakikada bir
 const ZIYARET_TTL = 86400;     // aynı ziyaretçi 24 saat içinde tekrar sayılmaz
@@ -11,6 +15,7 @@ const ZIYARET_TTL = 86400;     // aynı ziyaretçi 24 saat içinde tekrar sayıl
 let bellekToplam = null;   // KV'den okunan son değer
 let bekleyen = 0;          // henüz yazılmamış artış
 let sonYazma = 0;
+let yazmaSuruyor = false;   // aynı anda iki yazma denemesini engeller
 
 async function hash(metin) {
   const veri = new TextEncoder().encode(metin);
@@ -20,21 +25,37 @@ async function hash(metin) {
 
 async function toplamiOku(env) {
   if (bellekToplam === null) {
-    const ham = await env.SAYAC.get(ANAHTAR);
-    bellekToplam = ham ? parseInt(ham, 10) || 0 : 0;
+    try {
+      const ham = await env.SAYAC.get(ANAHTAR);
+      bellekToplam = ham ? parseInt(ham, 10) || 0 : 0;
+    } catch (e) {
+      return bekleyen; // KV okunamadıysa en azından bu isolate'in saydığını dön
+    }
   }
   return bellekToplam + bekleyen;
 }
 
+// Yazma başarısız olursa bekleyen artışlar korunur; ancak yazma DOĞRULANDIKTAN
+// sonra bellekteki toplam ilerletilir. Böylece KV ile bellek birbirinden kopmaz.
 async function belkiYaz(env) {
   const simdi = Date.now();
-  if (bekleyen === 0) return;
+  if (yazmaSuruyor || bekleyen === 0) return;
   if (bekleyen < YAZMA_ESIGI && simdi - sonYazma < YAZMA_ARALIGI) return;
-  const yeni = bellekToplam + bekleyen;
-  bekleyen = 0;
-  bellekToplam = yeni;
-  sonYazma = simdi;
-  await env.SAYAC.put(ANAHTAR, String(yeni));
+  if (bellekToplam === null) await toplamiOku(env);
+  if (bellekToplam === null) return;
+
+  yazmaSuruyor = true;
+  const yazilacak = bekleyen;
+  try {
+    await env.SAYAC.put(ANAHTAR, String(bellekToplam + yazilacak));
+    bellekToplam += yazilacak;
+    bekleyen -= yazilacak;
+    sonYazma = simdi;
+  } catch (e) {
+    // Yazılamadı: bekleyen olduğu gibi kalır, sonraki istekte yeniden denenir.
+  } finally {
+    yazmaSuruyor = false;
+  }
 }
 
 export default {
@@ -53,10 +74,20 @@ export default {
       return new Response(JSON.stringify({ hata: "yalnız GET" }), { status: 405, headers: basliklar });
     }
 
-    // Sayaç yalnız kendi sayfamızdan çağrılabilsin (curl ile şişirmeyi zorlaştırır)
+    // Sayaç yalnız kendi sayfamızdan çağrılabilsin (curl ile şişirmeyi zorlaştırır).
+    // Önek karşılaştırması yapılmaz: "https://ozamaninparasiyla.com.baska.site" gibi
+    // adresler geçmesin diye tam origin eşitliği aranır.
     const kaynak = request.headers.get("origin") || request.headers.get("referer") || "";
-    if (kaynak && !kaynak.startsWith("https://ozamaninparasiyla.com")) {
-      return new Response(JSON.stringify({ hata: "yetkisiz kaynak" }), { status: 403, headers: basliklar });
+    if (kaynak) {
+      let gelenOrigin = "";
+      try {
+        gelenOrigin = new URL(kaynak).origin;
+      } catch (e) {
+        gelenOrigin = "";
+      }
+      if (!IZINLI_KAYNAKLAR.includes(gelenOrigin)) {
+        return new Response(JSON.stringify({ hata: "yetkisiz kaynak" }), { status: 403, headers: basliklar });
+      }
     }
 
     const ip = request.headers.get("cf-connecting-ip") || "";
